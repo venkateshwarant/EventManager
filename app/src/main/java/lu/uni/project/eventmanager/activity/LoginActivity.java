@@ -1,4 +1,4 @@
-package lu.uni.project.eventmanager;
+package lu.uni.project.eventmanager.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +21,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+
+import lu.uni.project.eventmanager.R;
 
 public class LoginActivity extends AppCompatActivity {
 
