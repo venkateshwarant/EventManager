@@ -23,6 +23,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
 import lu.uni.project.eventmanager.R;
+import lu.uni.project.eventmanager.util.PreferenceKeys;
+import lu.uni.project.eventmanager.util.SharedPreferencesHelper;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -66,6 +68,10 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
+                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profilePhotoURI, account.getPhotoUrl());
+                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileFirstName, account.getGivenName());
+                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileLastName, account.getFamilyName());
+                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileDisplayName, account.getDisplayName());
                 firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
@@ -86,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
-//                            updateUI(user);
+                            startBottomoNavActivity();
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -97,5 +103,9 @@ public class LoginActivity extends AppCompatActivity {
                         // ...
                     }
                 });
+    }
+    public void startBottomoNavActivity(){
+        startActivity(new Intent(this, BottomNavigationActivity.class));
+        finish();
     }
 }
