@@ -6,5 +6,10 @@
     <color name="colorUnselectedIcon">#535353</color>
     <color name="colorSelectedIcon">#000</color>
     <color name="colorBlack">#000</color>
+    <color name="colorBlue">#4267B2</color>
+    <color name="colorButtonBlack">#222</color>
+    <color name="colorWhite">#FFF</color>
+    <color name="colorLightGrey">#D3D3D3</color>
+    <color name="colorMediumGrey">#DDDDDD</color>
 
 </resources>

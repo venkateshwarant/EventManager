@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="event_category">
+        <item>Private</item>
+        <item>Corporate</item>
+        <item>Charity/Fund rising</item>
+        <item>Other fun events</item>
+    </string-array>
+</resources>
