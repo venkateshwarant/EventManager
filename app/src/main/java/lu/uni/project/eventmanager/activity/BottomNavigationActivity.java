@@ -1,11 +1,15 @@
 package lu.uni.project.eventmanager.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 
 import androidx.annotation.RequiresApi;
@@ -30,6 +34,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bottom_navigation);
+        changeStatusBarColor(this);
         findViewById(R.id.home_btm_ic).setOnClickListener(this);
         findViewById(R.id.search_btm_ic).setOnClickListener(this);
         findViewById(R.id.add_btm_ic).setOnClickListener(this);
@@ -45,6 +50,9 @@ public class BottomNavigationActivity extends AppCompatActivity implements
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_unselected));
             ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_unselected));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
+        }
+        if(getIntent().getStringExtra("event_created")!=null && getIntent().getStringExtra("event_created").equals("true")){
+            Toast.makeText(this, "Event created!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -69,6 +77,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
         }else if(v.getId() == R.id.add_btm_ic){
             startActivity(new Intent(this, CreateEventActivity.class));
+            this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_unselected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_selected));
             ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_unselected));
@@ -101,5 +110,17 @@ public class BottomNavigationActivity extends AppCompatActivity implements
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+    public void changeStatusBarColor(Activity activity) {
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(activity.getResources().getColor(R.color.colorWhite));
+            View decorView = window.getDecorView();
+            int systemUiVisibilityFlags = decorView.getSystemUiVisibility();
+            systemUiVisibilityFlags = systemUiVisibilityFlags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            decorView.setSystemUiVisibility(systemUiVisibilityFlags);
+        }
     }
 }

@@ -1,9 +1,240 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.CreateEventStep5">
+    tools:context=".activity.CreateEventStep3">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="26"
+        android:orientation="vertical">
+        <androidx.cardview.widget.CardView
+            android:id="@+id/titleCardView"
+            android:layout_weight="2"
+            android:background="@color/colorButtonBlack"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:elevation="8dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0.0px"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            app:cardElevation="10dp">
+            <LinearLayout
+                android:background="@color/colorButtonBlack"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="10"
+                android:layout_gravity="center"
+                android:gravity="center">
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:gravity="center">
+                    <ImageView
+                        android:id="@+id/back"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="12dp"
+                        app:srcCompat="@drawable/ic_back"
+                        />
+                </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Pick a location"
+                    android:layout_weight="8"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="18dp"
+                    android:textStyle="bold"
+                    android:padding="16dp"
+                    app:layout_constraintBottom_toTopOf="@+id/eventName"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:gravity="center">
+                    <ImageView
+                        android:id="@+id/close"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginLeft="12dp"
+                        app:srcCompat="@drawable/ic_close"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <LinearLayout
+            android:padding="16dp"
+            android:id="@+id/step1"
+            android:layout_weight="21"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@drawable/create_event_background"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorBlack"
+                android:textSize="18dp"
+                android:layout_gravity="center|top"
+                android:gravity="center|top"
+                android:layout_marginTop="16dp"
+                android:textStyle="bold"
+                android:background="@android:color/transparent"
+                android:text="Step 5 of 5"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_gravity="center"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="8"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/pickLocationButton"
+                        android:layout_gravity="center"
+                        android:layout_width="0dp"
+                        android:layout_weight="4"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorButtonBlack"
+                        android:padding="8dp"
+                        android:textSize="10dp"
+                        android:drawableRight="@drawable/ic_location"
+                        android:background="@drawable/shape_black_button"
+                        android:text="Pick location      "/>
+                    <LinearLayout
+                        android:id="@+id/addressLayout"
+                        android:layout_width="0dp"
+                        android:layout_weight="4"
+                        android:padding="16dp"
+                        android:visibility="gone"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/shape_edit_text"
+                        android:orientation="vertical">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:weightSum="10"
+                            android:orientation="horizontal">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Address:"
+                                android:layout_weight="9"
+                                android:textStyle="bold"
+                                android:textColor="@color/colorBlack"/>
+                            <ImageView
+                                android:layout_weight="1"
+                                android:layout_width="16dp"
+                                android:src="@drawable/ic_edit_location"
+                                android:layout_height="16dp"/>
+                        </LinearLayout>
+                        <TextView
+                            android:id="@+id/addressText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/colorBlack"/>
+                    </LinearLayout>
+                </LinearLayout>
+                <EditText
+                    android:id="@+id/eventName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_edit_text"
+                    android:ellipsize="start"
+                    android:layout_marginBottom="40dp"
+                    android:hint="Venue details"
+                    android:minHeight="30dp"
+                    android:padding="16dp"
+                    android:height="100dp"
+                    android:layout_marginTop="26dp"
+                    app:layout_constraintBottom_toTopOf="@+id/eventDescription"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:layout_editor_absoluteX="16dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:background="@color/colorMediumGrey"
+            android:layout_weight="3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:elevation="8dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0.0px"
+            android:clipToPadding="false"
+            android:clipChildren="false"
+            app:cardElevation="10dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+                <Button
+                    android:id="@+id/next"
+                    android:padding="10dp"
+                    android:text="Create event"
+                    android:textSize="16dp"
+                    android:width="200dp"
+                    android:background="@drawable/shape_black_button_selected"
+                    android:textColor="@color/colorWhite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <FrameLayout android:id="@+id/progressBarHolder"
+        android:animateLayoutChanges="true"
+        android:visibility="gone"
+        android:alpha="0.4"
+        android:background="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateTintMode="src_atop"
+            android:indeterminateTint="@color/colorWhite"
+            android:indeterminate="true"
+            android:layout_gravity="center" />
+        <TextView
+            android:text="Creating"
+            android:layout_marginTop="16dp"
+            android:layout_gravity="center"
+            android:textColor="@color/colorWhite"
+            android:textSize="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+</RelativeLayout>
