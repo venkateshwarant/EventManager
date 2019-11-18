@@ -16,6 +16,7 @@ import android.view.View
 import android.view.WindowManager
 import android.view.animation.AlphaAnimation
 import android.widget.FrameLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toFile
@@ -44,7 +45,6 @@ class CreateEventStep5 : AppCompatActivity() {
     var zipc:String=""
     var inAnimation: AlphaAnimation? = null
     var outAnimation: AlphaAnimation? = null
-    var storageURL= "gs://eventmanager-2ff0c.appspot.com"
     var progressBarHolder: FrameLayout? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,10 +78,11 @@ class CreateEventStep5 : AppCompatActivity() {
             eventObj.endDate=event?.getString(BundleKeys.endDateKey)
             eventObj.images=event?.getString(BundleKeys.imagesListKey)
             eventObj.location= Location()
-            eventObj.location.address= addr
-            eventObj.location.latitude= lat
-            eventObj.location.longitude= lon
+            eventObj.location.setAddress(addr)
+            eventObj.location.setLatitude(lat)
+            eventObj.location.setLongitude(lon)
             eventObj.location.zipCode= zipc
+            eventObj.location.venueDetails=findViewById<TextView>(R.id.venueDetails).text.toString()
             eventObj.setUserId(FirebaseAuth.getInstance().currentUser?.uid)
             eventObj.setCreatedTime(System.currentTimeMillis().toString())
             UpdateTask().execute(eventObj)
@@ -218,11 +219,11 @@ class CreateEventStep5 : AppCompatActivity() {
                 var key= db.push().key!!
                 var event=params[0]
                 event?.eventId= key
+                event?.imagesCount= GlobalUtil.imagesList?.size
                 db.child(key).setValue(event)
-                var uriList= getURIListFromString(event?.images!!)
                 val storage = FirebaseStorage.getInstance()
                 var storageRef = storage.reference
-                var imagesRef: StorageReference? = storageRef.child("images/"+event.eventId+"/")
+                var imagesRef: StorageReference? = storageRef.child("images/"+event?.eventId+"/")
                 for(i in 0 until GlobalUtil.imagesList?.size!!){
                     val stream = FileInputStream(GlobalUtil.imagesList!![i].toFile())
                     var img= imagesRef?.child("$i.jpg")
