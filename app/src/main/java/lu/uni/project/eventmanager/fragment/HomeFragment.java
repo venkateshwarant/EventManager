@@ -33,6 +33,7 @@ import java.util.List;
 
 import lu.uni.project.eventmanager.R;
 import lu.uni.project.eventmanager.adapter.EventsAdapter;
+import lu.uni.project.eventmanager.bottomsheet.FillterBottomSheetFragment;
 import lu.uni.project.eventmanager.pojo.Event;
 
 public class HomeFragment extends Fragment implements AbsListView.OnScrollListener {
@@ -99,6 +100,14 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
         listView.addFooterView(footer);
         mySwipeRefreshLayout.setRefreshing(true);
 
+        root.findViewById(R.id.filter).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FillterBottomSheetFragment btmSheet= new FillterBottomSheetFragment();
+                btmSheet.show(getActivity().getSupportFragmentManager(),"");
+            }
+        });
+
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference ref = database.getReference("event");
         ref.addValueEventListener(new ValueEventListener() {
@@ -155,7 +164,7 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
     @Override
     public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
         if(firstVisibleItem + visibleItemCount == totalItemCount && !adapter.endReached() && !hasCallback){ //check if we've reached the bottom
-            mHandler.postDelayed(showMore, 300);
+//            mHandler.postDelayed(showMore, 300);
             hasCallback = true;
         }
     }
@@ -179,9 +188,8 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
                 @Override
                 public void run() {
                     mHandler = new Handler();
-                    View footer = getLayoutInflater().inflate(R.layout.progress_bar_footer, null);
-
-                    listView.addFooterView(footer);
+//                    View footer = getLayoutInflater().inflate(R.layout.progress_bar_footer, null);
+//                    listView.addFooterView(footer);
                     mySwipeRefreshLayout.setRefreshing(true);
 
                     final FirebaseDatabase database = FirebaseDatabase.getInstance();

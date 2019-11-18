@@ -61,7 +61,7 @@ class CreateEventStep5 : AppCompatActivity() {
             startActivityForResult(locationPickerIntent, MAP_BUTTON_REQUEST_CODE)
         }
         next.setOnClickListener{
-            var event= intent.extras?.getBundle(BundleKeys.event)
+            var event= intent.extras
             event?.putString(BundleKeys.addressKey,  addr)
             event?.putString(BundleKeys.lattitudeKey, lat)
             event?.putString(BundleKeys.longitudeKey, lon)
@@ -85,7 +85,8 @@ class CreateEventStep5 : AppCompatActivity() {
             eventObj.location.venueDetails=findViewById<TextView>(R.id.venueDetails).text.toString()
             eventObj.setUserId(FirebaseAuth.getInstance().currentUser?.uid)
             eventObj.setCreatedTime(System.currentTimeMillis().toString())
-            UpdateTask().execute(eventObj)
+            intent.putExtras(event!!)
+            UpdateTask().execute(eventObj as Object, this as Object)
 
 
 
@@ -206,8 +207,8 @@ class CreateEventStep5 : AppCompatActivity() {
             return output
         }
     }
-    private inner class UpdateTask : AsyncTask<Event, Void?, Void?>() {
-        override fun doInBackground(vararg params: Event?): Void? {
+    private inner class UpdateTask : AsyncTask<Object, Void?, Void?>() {
+        override fun doInBackground(vararg params: Object?): Void? {
             try {
                 var db= FirebaseDatabase.getInstance().getReference("event")
                 val auth = FirebaseAuth.getInstance()
@@ -216,11 +217,16 @@ class CreateEventStep5 : AppCompatActivity() {
                 if (user != null) {
                     uid = user.uid
                 }
-                var key= db.push().key!!
-                var event=params[0]
-                event?.eventId= key
-                event?.imagesCount= GlobalUtil.imagesList?.size
-                db.child(key).setValue(event)
+                var event=params[0] as Event
+                var activity=params[1] as Activity
+                if(activity?.intent?.extras?.get(BundleKeys.editEventKey)=="true"){
+                    event.eventId = activity?.intent?.extras?.get(BundleKeys.eventIDKey).toString()
+                }else{
+                    var key= db.push().key!!
+                    event.eventId = key
+                }
+                event.imagesCount = GlobalUtil.imagesList?.size!!
+                db.child(event.eventId).setValue(event)
                 val storage = FirebaseStorage.getInstance()
                 var storageRef = storage.reference
                 var imagesRef: StorageReference? = storageRef.child("images/"+event?.eventId+"/")
@@ -237,12 +243,18 @@ class CreateEventStep5 : AppCompatActivity() {
                 }
                 var intent= Intent(this@CreateEventStep5, BottomNavigationActivity::class.java)
                 intent.putExtra("event_created","true")
+                if(activity?.intent?.extras?.get(BundleKeys.editEventKey)=="true"){
+                    intent.putExtra(BundleKeys.editEventKey,"true")
+                }else{
+                    intent.putExtra("event_created","true")
+                }
                 startActivity(intent)
                 this@CreateEventStep5.overridePendingTransition(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right)
+
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             }
-        return null
+            return null
         }
 
         override fun onPreExecute() {

@@ -79,17 +79,17 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/heart_btm_ic"
+                android:id="@+id/star_btm_ic"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:padding="@dimen/padding_bottom_icon">
 
                 <ImageView
-                    android:id="@+id/ic_heart"
+                    android:id="@+id/ic_star"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/ic_heart_unselected" />
+                    app:srcCompat="@drawable/ic_star_black" />
             </LinearLayout>
 
             <LinearLayout

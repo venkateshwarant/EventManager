@@ -28,6 +28,10 @@ class CreateEventActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_event)
         changeStatusBarColor(this)
+        if(intent.extras!=null){
+            eventName.setText(intent.extras!!.getString(BundleKeys.eventNameKey))
+            eventDescription.setText(intent.extras!!.getString(BundleKeys.eventDescriptionKey))
+        }
         close.setOnClickListener{
             var listener= DialogInterface.OnClickListener{ dialogInterface: DialogInterface, i: Int ->
                 val gotoScreenVar = Intent(this, BottomNavigationActivity::class.java)
@@ -46,11 +50,16 @@ class CreateEventActivity : AppCompatActivity() {
         }
         next.setOnClickListener{
             if(eventName.text.toString()!=""){
+
+                var event= if(intent.extras!=null){
+                     intent.extras
+                }else{
+                     Bundle()
+                }
                 var intent= Intent(this, CreateEventStep2::class.java)
-                var event= Bundle()
-                event.putString(BundleKeys.eventNameKey, eventName.text.toString())
-                event.putString(BundleKeys.eventDescriptionKey, eventDescription.text.toString())
-                intent.putExtra(BundleKeys.event,event)
+                event?.putString(BundleKeys.eventNameKey, eventName.text.toString())
+                event?.putString(BundleKeys.eventDescriptionKey, eventDescription.text.toString())
+                intent.putExtras(event!!)
                 startActivity(intent)
                 this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
             }else{

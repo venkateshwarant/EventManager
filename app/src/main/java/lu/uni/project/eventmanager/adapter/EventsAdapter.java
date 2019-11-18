@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -48,11 +49,15 @@ import java.util.List;
 import java.util.Objects;
 
 import lu.uni.project.eventmanager.R;
+import lu.uni.project.eventmanager.activity.CreateEventActivity;
+import lu.uni.project.eventmanager.bottomsheet.ParticipantsBottomSheetFragment;
 import lu.uni.project.eventmanager.bottomsheet.ViewAllCommentsBottomSheetFragment;
 import lu.uni.project.eventmanager.dialog.RateEventDialog;
+import lu.uni.project.eventmanager.fragment.HomeFragment;
 import lu.uni.project.eventmanager.pojo.Comment;
 import lu.uni.project.eventmanager.pojo.Event;
 import lu.uni.project.eventmanager.pojo.User;
+import lu.uni.project.eventmanager.util.BundleKeys;
 import lu.uni.project.eventmanager.util.ImageHelper;
 
 
@@ -64,6 +69,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 	private int stepNumber;
 	private int startCount;
 	private int MAP_BUTTON_REQUEST_CODE= 1;
+	private int EDIT_EVENT_REQUEST_CODE= 1;
 
 	/**
 	 *
@@ -80,13 +86,6 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 		this.stepNumber = stepNumber;
 	}
 
-	public static void getEventsASynchronously(ValueEventListener listner)  {
-		final FirebaseDatabase database = FirebaseDatabase.getInstance();
-		DatabaseReference ref = database.getReference("event");
-		ref.addValueEventListener(listner);
-	}
-
-
 	public List<StorageReference> getEventImageStorageReference(Event event){
         final List<StorageReference> imgRefList= new ArrayList<>();
         for(int i=0; i<event.imagesCount; i++){
@@ -97,228 +96,396 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         return imgRefList;
     }
 
-    public List<String> getEventComments(Event event){
-        final List<String> stringList= new ArrayList<>();
-
-        return stringList;
-    }
 	@Override
 	public int getCount() {
 		return count;
 	}
 	
 	@Override
-	public View getView(final int position, View convertView, ViewGroup parent) {
-		final View view;
-		if(convertView == null){
+	public View getView(final int position, View view, ViewGroup parent) {
+        final ViewHolder holder;
+
+        if(view == null){
 			view = LayoutInflater.from(context).inflate(R.layout.row_layout, null);
-            TextView eventName= view.findViewById(R.id.eventName);
-            final TextView name= view.findViewById(R.id.name);
-            final ImageView profileImage= view.findViewById(R.id.profile_image);
-            TextView detailsEventName= view.findViewById(R.id.detailsEventName);
-            TextView detailsEventDescription= view.findViewById(R.id.detailsEventDescrition);
-            TextView detailsEventType= view.findViewById(R.id.detailsEventType);
-            TextView detailsStartDate= view.findViewById(R.id.detailsStartDate);
-            TextView detailsEndDate= view.findViewById(R.id.detailsEndDate);
-            TextView detailsContactEmailID= view.findViewById(R.id.detailsContactEmail);
-            TextView detailsContactPhoneNumber= view.findViewById(R.id.detailscontactPhNo);
-            TextView detailsAddress= view.findViewById(R.id.detailsLocationAddress);
-            TextView detailsVenue= view.findViewById(R.id.detailsVenueDetails);
-            LinearLayout location= view.findViewById(R.id.location);
-            LinearLayout direction= view.findViewById(R.id.direction);
-            final LinearLayout menuLayout= view.findViewById(R.id.eventMenuIcon);
-            final LinearLayout rateEvent= view.findViewById(R.id.rate);
-            final ImageView rateImage= view.findViewById(R.id.starImage);
-            final TextView rateCount= view.findViewById(R.id.rateCount);
-            TextView viewAllComments= view.findViewById(R.id.viewAllComments);
-            final EditText comment= view.findViewById(R.id.commentBox);
-            final CardView eventBox= view.findViewById(R.id.eventBox);
-            Button postComment= view.findViewById(R.id.commentBtn);
-
-            eventName.setText(values.get(position).getEventName());
-            detailsEventName.setText(values.get(position).getEventName());
-            detailsEventDescription.setText(values.get(position).getEventDescription());
-            detailsEventType.setText(values.get(position).getEventCategory());
-            detailsStartDate.setText(values.get(position).getStartDate());
-            detailsEndDate.setText(values.get(position).getEndDate());
-            detailsContactEmailID.setText("");
-            detailsContactPhoneNumber.setText("");
-            detailsAddress.setText(values.get(position).getLocation().getAddress());
-            detailsVenue.setText(values.get(position).getLocation().getVenueDetails());
-
-			final FirebaseDatabase database = FirebaseDatabase.getInstance();
-			FirebaseAuth auth = FirebaseAuth.getInstance();
-			FirebaseUser user = auth.getCurrentUser();
-			String uid = "";
-			if (user != null) {
-				uid = user.getUid();
-			}
-			final DatabaseReference userRef = database.getReference("user").child(values.get(position).getUserId());
-			userRef.addValueEventListener(new ValueEventListener() {
-				@Override
-				public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-					final User user= dataSnapshot.getValue(User.class);
-					if(user!=null){
-						name.setText(user.getDisplayName());
-						RetrieveProfileImage task= new RetrieveProfileImage();
-						task.execute(user.getProfileImgURL(), profileImage, context);
-						menuLayout.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								if(user.getUid()!=null&& FirebaseAuth.getInstance().getCurrentUser()!=null){
-									PopupMenu popupMenu = new PopupMenu(context, menuLayout);
-									if(user.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-										popupMenu.getMenu().add("Delete event");
-										popupMenu.getMenu().add("Edit event");
-									}else{
-										popupMenu.getMenu().add("Register");
-									}
-									popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-										@Override
-										public boolean onMenuItemClick(MenuItem item) {
-											if(item.getTitle().toString().equals("Delete event")){
-                                                new AlertDialog.Builder(context)
-                                                        .setTitle("Discard event?")
-                                                        .setMessage("Are you sure you want to delete this event?")
-                                                        .setPositiveButton(android.R.string.no, null)
-                                                        .setNegativeButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                                                            @Override
-                                                            public void onClick(DialogInterface dialog, int which) {
-                                                                FirebaseDatabase.getInstance().getReference("event").child(values.get(position).getEventId()).removeValue();
-                                                                FirebaseDatabase.getInstance().getReference("rating").child(values.get(position).getEventId()).removeValue();
-                                                                FirebaseDatabase.getInstance().getReference("comment").child(values.get(position).getEventId()).removeValue();
-                                                                for(int i=0;i<values.get(position).imagesCount;i++){
-                                                                    FirebaseStorage.getInstance().getReference().child("images").child(values.get(position).getEventId()).child(i+".jpg").delete();
-                                                                }
-                                                                eventBox.setVisibility(View.GONE);
-                                                            }
-                                                        })
-                                                        .setIcon(android.R.drawable.ic_dialog_alert)
-                                                        .show();
-											}
-											return false;
-										}
-									});
-									popupMenu.show();
-								}
-							}
-						});
-					}
-					userRef.removeEventListener(this);
-				}
-
-				@Override
-				public void onCancelled(@NonNull DatabaseError databaseError) {
-
-				}
-			});
-			final DatabaseReference ref = database.getReference("rating").child(values.get(position).getEventId()).child(uid);
-			ref.addValueEventListener(new ValueEventListener() {
-				@Override
-				public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-					if(dataSnapshot.getValue()!=null){
-						rateCount.setText(dataSnapshot.getValue().toString());
-						rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star_filled));
-					}
-					ref.removeEventListener(this);
-				}
-
-				@Override
-				public void onCancelled(@NonNull DatabaseError databaseError) {
-
-				}
-			});
-
-            viewAllComments.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    ViewAllCommentsBottomSheetFragment btmSheet= new ViewAllCommentsBottomSheetFragment(values.get(position));
-                    btmSheet.show(context.getSupportFragmentManager(), "");
-                }
-            });
-
-            postComment.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    DatabaseReference db= FirebaseDatabase.getInstance().getReference("comment");
-                    FirebaseAuth auth = FirebaseAuth.getInstance();
-                    FirebaseUser user = auth.getCurrentUser();
-                    String uid = "";
-                    if (user != null) {
-                        uid = user.getUid();
-                    }
-                    Comment commentObj= new Comment();
-                    commentObj.setComment(comment.getText().toString());
-                    commentObj.setCreatedTime(Long.toString(System.currentTimeMillis()));
-                    commentObj.setUserID(uid);
-                    commentObj.setCommentID(db.push().getKey());
-                    db.child(values.get(position).getEventId()).child(commentObj.getCommentID()).setValue(commentObj);
-                    InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
-                    inputManager.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
-                    comment.setText("");
-                    Toast.makeText(context,"Comment added!", Toast.LENGTH_SHORT).show();
-                }
-            });
-            location.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent locationPickerIntent = new LocationPickerActivity.Builder()
-							.withGeolocApiKey("AIzaSyBr5l_bqBZWFO9W2Ys3HrNRwF0_9628KYo")
-							.withLocation(Float.parseFloat(values.get(position).getLocation().getLatitude()), Float.parseFloat(values.get(position).getLocation().getLongitude()))
-							.withZipCodeHidden()
-							.withGooglePlacesEnabled()
-							.withGoogleTimeZoneEnabled()
-							.build(getContext());
-
-					context.startActivityForResult(locationPickerIntent, MAP_BUTTON_REQUEST_CODE);
-				}
-			});
-
-            direction.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                            Uri.parse("http://maps.google.com/maps?daddr="+values.get(position).getLocation().getLatitude()+","+values.get(position).getLocation().getLongitude()));
-                    context.startActivity(intent);
-                }
-            });
-
-			rateEvent.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					if(context!=null){
-						RateEventDialog rateEventDiaog= new RateEventDialog(context, values.get(position), new RateEventDialog.DismisListner() {
-							@Override
-							public void onDismiss(float rating) {
-                                rateCount.setText(Float.toString(rating));
-                                rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star_filled));
-							}
-						});
-						rateEventDiaog.show();
-					}
-				}
-			});
-
-			View eventDetailsHolder= view.findViewById(R.id.eventDetails);
-			SliderView imageSlider= view.findViewById(R.id.imageSlider);
-			imageSlider.setSliderAdapter(new SliderAdapter(context, getEventImageStorageReference(values.get(position)), true));
-
-			eventDetailsHolder.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					View eventDetails= view.findViewById(R.id.eventDetailsScrollPort);
-					if(eventDetails.getVisibility()==View.GONE){
-						eventDetails.setVisibility(View.VISIBLE);
-					}else{
-						eventDetails.setVisibility(View.GONE);
-					}
-				}
-			});
+            holder = new ViewHolder();
+            holder.eventName= view.findViewById(R.id.eventName);
+            holder.name= view.findViewById(R.id.name);
+            holder.profileImage= view.findViewById(R.id.profile_image);
+            holder.detailsEventName= view.findViewById(R.id.detailsEventName);
+            holder.detailsEventDescription= view.findViewById(R.id.detailsEventDescrition);
+            holder.detailsEventType= view.findViewById(R.id.detailsEventType);
+            holder.detailsStartDate= view.findViewById(R.id.detailsStartDate);
+            holder.detailsEndDate= view.findViewById(R.id.detailsEndDate);
+            holder.detailsContactEmailID= view.findViewById(R.id.detailsContactEmail);
+            holder.detailsContactPhoneNumber= view.findViewById(R.id.detailscontactPhNo);
+            holder.detailsAddress= view.findViewById(R.id.detailsLocationAddress);
+            holder.detailsVenue= view.findViewById(R.id.detailsVenueDetails);
+            holder.location= view.findViewById(R.id.location);
+            holder.direction= view.findViewById(R.id.direction);
+            holder.menuLayout= view.findViewById(R.id.eventMenuIcon);
+            holder.rateEvent= view.findViewById(R.id.rate);
+            holder.rateImage= view.findViewById(R.id.starImage);
+            holder.rateCount= view.findViewById(R.id.rateCount);
+            holder.viewAllComments= view.findViewById(R.id.viewAllComments);
+            holder.comment= view.findViewById(R.id.commentBox);
+            holder.eventBox= view.findViewById(R.id.eventBox);
+            holder.postComment= view.findViewById(R.id.commentBtn);
+            holder.eventDetails= view.findViewById(R.id.eventDetailsScrollPort);
+            holder.save= view.findViewById(R.id.save);
+            holder.saveText= view.findViewById(R.id.saveText);
+            holder.participantsCount= view.findViewById(R.id.participantsCount);
+            holder.saveImage= view.findViewById(R.id.saveImg);
+            holder.participants= view.findViewById(R.id.participants);
+            view.setTag(holder);
 		}else{
-			view = convertView;
+            holder = (ViewHolder) view.getTag();
 		}
+        holder.eventName.setText(values.get(position).getEventName());
+        holder.detailsEventName.setText(values.get(position).getEventName());
+        holder.detailsEventDescription.setText(values.get(position).getEventDescription());
+        holder.detailsEventType.setText(values.get(position).getEventCategory());
+        holder.detailsStartDate.setText(values.get(position).getStartDate());
+        holder.detailsEndDate.setText(values.get(position).getEndDate());
+        holder.detailsContactEmailID.setText("");
+        holder.detailsContactPhoneNumber.setText("");
+        holder.detailsAddress.setText(values.get(position).getLocation().getAddress());
+        holder.detailsVenue.setText(values.get(position).getLocation().getVenueDetails());
+
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+        assert user != null;
+        final String uid = user.getUid();
+
+        final DatabaseReference userRef = database.getReference("user").child(values.get(position).getUserId());
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                final User user= dataSnapshot.getValue(User.class);
+                if(user!=null){
+                    holder.name.setText(user.getDisplayName());
+                    RetrieveProfileImage task= new RetrieveProfileImage();
+                    task.execute(user.getProfileImgURL(), holder.profileImage, context);
+                    holder.menuLayout.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if(user.getUid()!=null&& FirebaseAuth.getInstance().getCurrentUser()!=null){
+                                PopupMenu popupMenu = new PopupMenu(context, holder.menuLayout);
+                                if(user.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+                                    popupMenu.getMenu().add("Delete event");
+                                    popupMenu.getMenu().add("Edit event");
+                                }else{
+                                    popupMenu.getMenu().add("Register");
+                                }
+                                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                    @Override
+                                    public boolean onMenuItemClick(MenuItem item) {
+                                        if(item.getTitle().toString().equals("Delete event")){
+                                            new AlertDialog.Builder(context)
+                                                    .setTitle("Discard event?")
+                                                    .setMessage("Are you sure you want to delete this event?")
+                                                    .setPositiveButton(android.R.string.no, null)
+                                                    .setNegativeButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            holder.eventBox.setVisibility(View.GONE);
+                                                            FirebaseDatabase.getInstance().getReference("event").child(values.get(position).getEventId()).removeValue();
+                                                            FirebaseDatabase.getInstance().getReference("rating").child(values.get(position).getEventId()).removeValue();
+                                                            FirebaseDatabase.getInstance().getReference("comment").child(values.get(position).getEventId()).removeValue();
+                                                            for(int i=0;i<values.get(position).imagesCount;i++){
+                                                                FirebaseStorage.getInstance().getReference().child("images").child(values.get(position).getEventId()).child(i+".jpg").delete();
+                                                            }
+                                                            Toast.makeText(getContext(),"Event deleted!", Toast.LENGTH_SHORT).show();
+                                                            reloadData();
+                                                        }
+                                                    })
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .show();
+                                        }else if(item.getTitle().toString().equals("Edit event")){
+                                            Bundle bundle= new Bundle();
+                                            bundle.putString(BundleKeys.Companion.getEventIDKey(), values.get(position).eventId);
+                                            bundle.putString(BundleKeys.Companion.getEventNameKey(), values.get(position).eventName);
+                                            bundle.putString(BundleKeys.Companion.getEventCreatedTimeKey(), values.get(position).createdTime);
+                                            bundle.putString(BundleKeys.Companion.getEndDateKey(), values.get(position).endDate);
+                                            bundle.putString(BundleKeys.Companion.getEndTimeKey(), values.get(position).endTime);
+                                            bundle.putString(BundleKeys.Companion.getEventCategoryKey(), values.get(position).eventCategory);
+                                            bundle.putString(BundleKeys.Companion.getEventDescriptionKey(), values.get(position).eventDescription);
+                                            bundle.putString(BundleKeys.Companion.getImagesListKey(), values.get(position).images);
+                                            bundle.putString(BundleKeys.Companion.getImagesCountKey(), Integer.toString(values.get(position).imagesCount));
+                                            bundle.putString(BundleKeys.Companion.getAddressKey(), values.get(position).location.address);
+                                            bundle.putString(BundleKeys.Companion.getLattitudeKey(), values.get(position).location.latitude);
+                                            bundle.putString(BundleKeys.Companion.getLongitudeKey(), values.get(position).location.longitude);
+                                            bundle.putString(BundleKeys.Companion.getVenueDetailsKey(), values.get(position).location.venueDetails);
+                                            bundle.putString(BundleKeys.Companion.getZipcodeKey(), values.get(position).location.zipCode);
+                                            bundle.putString(BundleKeys.Companion.getEditEventKey(), "true");
+                                            Intent intent= new Intent(context, CreateEventActivity.class);
+                                            intent.putExtras(bundle);
+                                            context.startActivityForResult(intent, EDIT_EVENT_REQUEST_CODE);
+                                            context.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
+                                        }else if(item.getTitle().toString().equals("Register")){
+                                            FirebaseAuth auth = FirebaseAuth.getInstance();
+                                            FirebaseUser user = auth.getCurrentUser();
+                                            DatabaseReference db= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId()).child(user.getUid());
+                                            db.setValue(0);
+                                            final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
+                                            regDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                    int i=0;
+                                                    for(DataSnapshot child:dataSnapshot.getChildren()){
+                                                        i++;
+                                                    }
+                                                    holder.participantsCount.setText(Integer.toString(i));
+                                                    regDB.removeEventListener(this);
+                                                }
+
+                                                @Override
+                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                }
+                                            });
+                                        }
+                                        return false;
+                                    }
+                                });
+                                popupMenu.show();
+                            }
+                        }
+                    });
+                }
+                userRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        holder.save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final DatabaseReference ref = database.getReference("saved").child(uid).child(values.get(position).getEventId());
+                ref.setValue(0);
+                holder.saveText.setText("Saved");
+                holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmarked));
+                Toast.makeText(context, "Event saved", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
+        regDB.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int i=0;
+                for(DataSnapshot child:dataSnapshot.getChildren()){
+                    i++;
+                }
+                holder.participantsCount.setText(Integer.toString(i));
+                regDB.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        final DatabaseReference ref = database.getReference("rating").child(values.get(position).getEventId()).child(uid);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getValue()!=null){
+                    holder.rateCount.setText(dataSnapshot.getValue().toString());
+                    holder.rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star_filled));
+                }
+                ref.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        final DatabaseReference saveRef = database.getReference("saved").child(uid);
+                saveRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for(DataSnapshot child : dataSnapshot.getChildren()){
+                            if(child.getKey().equals(values.get(position).getEventId())){
+                                holder.saveText.setText("Saved");
+                                holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmarked));
+                            }
+                        }
+                        saveRef.removeEventListener(this);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+        holder.viewAllComments.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ViewAllCommentsBottomSheetFragment btmSheet= new ViewAllCommentsBottomSheetFragment(values.get(position));
+                btmSheet.show(context.getSupportFragmentManager(), "");
+            }
+        });
+
+        holder.participants.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParticipantsBottomSheetFragment btmSheet= new ParticipantsBottomSheetFragment(values.get(position));
+                btmSheet.show(context.getSupportFragmentManager(), "");
+            }
+        });
+
+        holder.postComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference db= FirebaseDatabase.getInstance().getReference("comment");
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                FirebaseUser user = auth.getCurrentUser();
+                String uid = "";
+                if (user != null) {
+                    uid = user.getUid();
+                }
+                Comment commentObj= new Comment();
+                commentObj.setComment(holder.comment.getText().toString());
+                commentObj.setCreatedTime(Long.toString(System.currentTimeMillis()));
+                commentObj.setUserID(uid);
+                commentObj.setCommentID(db.push().getKey());
+                db.child(values.get(position).getEventId()).child(commentObj.getCommentID()).setValue(commentObj);
+                InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputManager.hideSoftInputFromWindow(context.getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+                holder.comment.setText("");
+                Toast.makeText(context,"Comment added!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        holder.location.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent locationPickerIntent = new LocationPickerActivity.Builder()
+                        .withGeolocApiKey("AIzaSyBr5l_bqBZWFO9W2Ys3HrNRwF0_9628KYo")
+                        .withLocation(Float.parseFloat(values.get(position).getLocation().getLatitude()), Float.parseFloat(values.get(position).getLocation().getLongitude()))
+                        .withZipCodeHidden()
+                        .withGooglePlacesEnabled()
+                        .withGoogleTimeZoneEnabled()
+                        .build(getContext());
+
+                context.startActivityForResult(locationPickerIntent, MAP_BUTTON_REQUEST_CODE);
+            }
+        });
+
+        holder.direction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse("http://maps.google.com/maps?daddr="+values.get(position).getLocation().getLatitude()+","+values.get(position).getLocation().getLongitude()));
+                context.startActivity(intent);
+            }
+        });
+
+        holder.rateEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(context!=null){
+                    RateEventDialog rateEventDiaog= new RateEventDialog(context, values.get(position), new RateEventDialog.DismisListner() {
+                        @Override
+                        public void onDismiss(float rating) {
+                            holder. rateCount.setText(Float.toString(rating));
+                            holder.rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star_filled));
+                        }
+                    });
+                    rateEventDiaog.show();
+                }
+            }
+        });
+        View eventDetailsHolder= view.findViewById(R.id.eventDetails);
+        SliderView imageSlider= view.findViewById(R.id.imageSlider);
+        imageSlider.setSliderAdapter(new SliderAdapter(context, getEventImageStorageReference(values.get(position)), true));
+        eventDetailsHolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(holder.eventDetails.getVisibility()==View.GONE){
+                    holder.eventDetails.setVisibility(View.VISIBLE);
+                }else{
+                    holder.eventDetails.setVisibility(View.GONE);
+                }
+            }
+        });
 		return view;
 	}
+
+
+
+
+
+    class ViewHolder {
+        TextView eventName;
+        TextView name;
+        ImageView profileImage;
+        TextView detailsEventName;
+        TextView detailsEventDescription;
+        TextView detailsEventType;
+        TextView detailsStartDate;
+        TextView detailsEndDate;
+        TextView detailsContactEmailID;
+        TextView detailsContactPhoneNumber;
+        TextView detailsAddress;
+        TextView detailsVenue;
+        LinearLayout location;
+        LinearLayout direction;
+        LinearLayout menuLayout;
+        LinearLayout rateEvent;
+        LinearLayout participants;
+        LinearLayout save;
+        ImageView rateImage;
+        TextView rateCount;
+        TextView viewAllComments;
+        EditText comment;
+        CardView eventBox;
+        Button postComment;
+        View eventDetails;
+        TextView saveText;
+        TextView participantsCount;
+        ImageView saveImage;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    public void reloadData(){
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference ref = database.getReference("event");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                values.clear();
+                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                    Event event = postSnapshot.getValue(Event.class);
+                    values.add(event);
+                }
+                count=values.size();
+                ref.removeEventListener(this);
+                notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
 
 
 
