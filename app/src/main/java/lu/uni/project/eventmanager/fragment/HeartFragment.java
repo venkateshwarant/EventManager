@@ -1,7 +1,9 @@
 package lu.uni.project.eventmanager.fragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 
 import lu.uni.project.eventmanager.R;
 
@@ -45,6 +49,7 @@ public class HeartFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        changeStatusBarColor(getActivity());
         return inflater.inflate(R.layout.fragment_heart, container, false);
     }
 
@@ -73,5 +78,18 @@ public class HeartFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
+    }
+
+    public static void changeStatusBarColor(Activity activity ) {
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(activity.getResources().getColor(R.color.colorWhite));
+            View decorView = window.getDecorView();
+            int systemUiVisibilityFlags = decorView.getSystemUiVisibility();
+            systemUiVisibilityFlags = systemUiVisibilityFlags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            decorView.setSystemUiVisibility(systemUiVisibilityFlags);
+        }
     }
 }

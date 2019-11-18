@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="padding_bottom_icon">10dp</dimen>
+    <dimen name="btm_sht_crnr_radius">16dp</dimen>
 </resources>

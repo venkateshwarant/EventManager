@@ -9,6 +9,7 @@ public class Location implements Serializable {
     public String longitude="";
     public String address="";
     public String zipCode="";
+    public String venueDetails="";
 
     public Location() {
     }
@@ -59,4 +60,11 @@ public class Location implements Serializable {
         this.zipCode = zipCode;
     }
 
+    public String getVenueDetails() {
+        return venueDetails;
+    }
+
+    public void setVenueDetails(String venueDetails) {
+        this.venueDetails = venueDetails;
+    }
 }

@@ -61,7 +61,11 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
     implementation 'com.takisoft.datetimepicker:datetimepicker:1.0.0'
     implementation 'com.schibstedspain.android:leku:6.4.0'
-
+    implementation 'com.firebaseui:firebase-ui-database:6.1.0'
+    implementation 'com.firebaseui:firebase-ui-firestore:6.1.0'
+    implementation 'com.firebaseui:firebase-ui-auth:6.1.0'
+    implementation 'com.firebaseui:firebase-ui-storage:6.1.0'
+    implementation 'com.github.andrefrsousa:SuperBottomSheet:1.5.0'
 }
 apply plugin: 'com.google.gms.google-services'
 repositories {

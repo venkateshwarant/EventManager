@@ -21,8 +21,13 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 
 import lu.uni.project.eventmanager.R;
+import lu.uni.project.eventmanager.pojo.User;
 import lu.uni.project.eventmanager.util.PreferenceKeys;
 import lu.uni.project.eventmanager.util.SharedPreferencesHelper;
 
@@ -52,9 +57,9 @@ public class LoginActivity extends AppCompatActivity {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
+                .requestProfile()
                 .build();
         GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -92,6 +97,22 @@ public class LoginActivity extends AppCompatActivity {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
+                            DatabaseReference db= FirebaseDatabase.getInstance().getReference("user").child(user.getUid());
+                            db.child(user.getUid());
+                            User userObj= new User();
+                            userObj.setDisplayName(user.getDisplayName());
+                            userObj.setUid(user.getUid());
+//                            ArrayList<String> eId= new ArrayList();
+//                            eId.add(user.getEmail());
+//                            userObj.setEmailID(eId);
+                            userObj.setEmailID(user.getEmail());
+//                            ArrayList<String> pNo= new ArrayList();
+//                            pNo.add(user.getPhoneNumber());
+//                            userObj.setPhoneNumber(pNo);
+                            userObj.setPhoneNumber(user.getPhoneNumber());
+                            userObj.setProfileImgURL(user.getPhotoUrl().toString());
+                            db.setValue(userObj);
+
                             startBottomoNavActivity();
                         } else {
                             // If sign in fails, display a message to the user.
