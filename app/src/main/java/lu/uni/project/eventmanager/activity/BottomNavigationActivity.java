@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -22,6 +23,7 @@ import lu.uni.project.eventmanager.fragment.HeartFragment;
 import lu.uni.project.eventmanager.fragment.HomeFragment;
 import lu.uni.project.eventmanager.fragment.SearchFragment;
 import lu.uni.project.eventmanager.fragment.UserFragment;
+import lu.uni.project.eventmanager.util.BundleKeys;
 
 public class BottomNavigationActivity extends AppCompatActivity implements
         View.OnClickListener,
@@ -38,7 +40,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements
         findViewById(R.id.home_btm_ic).setOnClickListener(this);
         findViewById(R.id.search_btm_ic).setOnClickListener(this);
         findViewById(R.id.add_btm_ic).setOnClickListener(this);
-        findViewById(R.id.heart_btm_ic).setOnClickListener(this);
+        findViewById(R.id.star_btm_ic).setOnClickListener(this);
         findViewById(R.id.user_btm_ic).setOnClickListener(this);
         HomeFragment homeFrag = new HomeFragment();
         FragmentManager fragmentManager = this.getSupportFragmentManager();
@@ -48,10 +50,12 @@ public class BottomNavigationActivity extends AppCompatActivity implements
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_selected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_unselected));
-            ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_unselected));
+            ((ImageView) findViewById(R.id.ic_star)).setImageDrawable(getDrawable(R.drawable.ic_star_black));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
         }
-        if(getIntent().getStringExtra("event_created")!=null && getIntent().getStringExtra("event_created").equals("true")){
+        if(getIntent().getStringExtra(BundleKeys.Companion.getEditEventKey())!=null && getIntent().getStringExtra(BundleKeys.Companion.getEditEventKey()).equals("true")){
+            Toast.makeText(this, "Event edited!", Toast.LENGTH_SHORT).show();
+        }else if(getIntent().getStringExtra("event_created")!=null && getIntent().getStringExtra("event_created").equals("true")){
             Toast.makeText(this, "Event created!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -66,42 +70,42 @@ public class BottomNavigationActivity extends AppCompatActivity implements
             fragmentTransaction.replace(R.id.bottomSheetFragmentHolder, homeFrag);
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_selected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_unselected));
-            ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_unselected));
+            ((ImageView) findViewById(R.id.ic_star)).setImageDrawable(getDrawable(R.drawable.ic_star_black));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
         }else if(v.getId() == R.id.search_btm_ic){
             SearchFragment searchFrag= new SearchFragment();
             fragmentTransaction.replace(R.id.bottomSheetFragmentHolder, searchFrag);
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_unselected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_selected));
-            ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_unselected));
+            ((ImageView) findViewById(R.id.ic_star)).setImageDrawable(getDrawable(R.drawable.ic_star_black));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
         }else if(v.getId() == R.id.add_btm_ic){
             startActivity(new Intent(this, CreateEventActivity.class));
             this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_unselected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_selected));
-            ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_unselected));
+            ((ImageView) findViewById(R.id.ic_star)).setImageDrawable(getDrawable(R.drawable.ic_star_black));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
-        }else if(v.getId() == R.id.heart_btm_ic){
+        }else if(v.getId() == R.id.star_btm_ic){
             HeartFragment heartFrag= new HeartFragment();
             fragmentTransaction.replace(R.id.bottomSheetFragmentHolder, heartFrag);
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_unselected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_unselected));
-            ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_selected));
+            ((ImageView) findViewById(R.id.ic_star)).setImageDrawable(getDrawable(R.drawable.ic_star_black_selected));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
         }else if(v.getId() == R.id.user_btm_ic){
             UserFragment userFrag= new UserFragment();
             fragmentTransaction.replace(R.id.bottomSheetFragmentHolder, userFrag);
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_unselected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_unselected));
-            ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_unselected));
+            ((ImageView) findViewById(R.id.ic_star)).setImageDrawable(getDrawable(R.drawable.ic_star_black));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_selected));
         }else{
             HomeFragment homeFrag = new HomeFragment();
             fragmentTransaction.replace(R.id.bottomSheetFragmentHolder, homeFrag);
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_selected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_unselected));
-            ((ImageView) findViewById(R.id.ic_heart)).setImageDrawable(getDrawable(R.drawable.ic_heart_unselected));
+            ((ImageView) findViewById(R.id.ic_star)).setImageDrawable(getDrawable(R.drawable.ic_star_black));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
         }
         fragmentTransaction.commit();
@@ -111,6 +115,15 @@ public class BottomNavigationActivity extends AppCompatActivity implements
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==123){
+
+        }
+    }
+
     public void changeStatusBarColor(Activity activity) {
         Window window = activity.getWindow();
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);

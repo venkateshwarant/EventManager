@@ -44,10 +44,10 @@ class CreateEventStep3 : AppCompatActivity(),  BSImagePicker.OnSingleImageSelect
         }
         changeStatusBarColor(this)
         next.setOnClickListener{
-            var event= intent.extras?.getBundle(BundleKeys.event)
+            var event= intent.extras
             event?.putString(BundleKeys.imagesListKey, imagesList.toString())
             var intent= Intent(this, CreateEventStep4::class.java)
-            intent.putExtra(BundleKeys.event, event)
+            intent.putExtras( event!!)
             startActivity(intent)
             this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
         }

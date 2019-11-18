@@ -54,6 +54,7 @@ class CreateEventStep2 : AppCompatActivity() {
 
             }
         })
+
         findViewById<LinearLayout>(R.id.close).setOnClickListener{
             var listener= DialogInterface.OnClickListener{ dialogInterface: DialogInterface, i: Int ->
                 val gotoScreenVar = Intent(this, BottomNavigationActivity::class.java)
@@ -71,10 +72,10 @@ class CreateEventStep2 : AppCompatActivity() {
                     .show()
         }
         next.setOnClickListener{
-            var event= intent.extras?.getBundle(BundleKeys.event)
+            var event= intent.extras
             event?.putString(BundleKeys.eventCategoryKey, mSearchableSpinner?.selectedItem?.toString())
             var intent= Intent(this, CreateEventStep3::class.java)
-            intent.putExtra(BundleKeys.event, event)
+            intent.putExtras( event!!)
             startActivity(intent)
             this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
         }

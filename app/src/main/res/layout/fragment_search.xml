@@ -1,14 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="20"
     tools:context=".fragment.SearchFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Search Fragment" />
 
-</FrameLayout>
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="2">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:weightSum="10"
+                android:layout_margin="6dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <EditText
+                    android:id="@+id/searchInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawableRight="@drawable/ic_search_btn"
+                    android:paddingLeft="16dp"
+                    android:hint="Search events"
+                    android:inputType="text"
+                    android:singleLine="true"
+                    android:imeOptions="actionSearch"
+                    android:paddingRight="16dp"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+            <ListView
+                android:layout_weight="18"
+                android:id="@+id/filterList"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:scrollbars="vertical">
+
+            </ListView>
+    </LinearLayout>
+

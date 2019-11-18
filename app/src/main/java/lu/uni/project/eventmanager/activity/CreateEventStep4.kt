@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_create_event_step3.back
 import kotlinx.android.synthetic.main.activity_create_event_step3.close
 import kotlinx.android.synthetic.main.activity_create_event_step3.next
 import kotlinx.android.synthetic.main.activity_create_event_step4.*
+import kotlinx.android.synthetic.main.layout_create_event_step1.*
 import lu.uni.project.eventmanager.R
 import lu.uni.project.eventmanager.adapter.SimpleArrayListAdapter
 import lu.uni.project.eventmanager.util.BundleKeys
@@ -45,14 +46,14 @@ class CreateEventStep4 : AppCompatActivity() {
         setContentView(R.layout.activity_create_event_step4)
         changeStatusBarColor(this)
         next.setOnClickListener{
-            var event= intent.extras?.getBundle(BundleKeys.event)
+            var event= intent.extras
             event?.putString(BundleKeys.startDateKey, startDateText.text.toString())
             event?.putString(BundleKeys.endDateKey, endDateText.text.toString())
             event?.putString(BundleKeys.startTimeKey, startTimeText.text.toString())
             event?.putString(BundleKeys.endTimeKey, endTimeText.text.toString())
 
             var intent= Intent(this, CreateEventStep5::class.java)
-            intent.putExtra(BundleKeys.event, event)
+            intent.putExtras( event!!)
             startActivity(intent)
             this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
         }

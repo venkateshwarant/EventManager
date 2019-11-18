@@ -11,7 +11,7 @@
               app:layout_collapseMode="parallax"
               app:layout_collapseParallaxMultiplier="0.5">
 
-    <LinearLayout
+    <!--<LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -30,5 +30,5 @@
             android:textStyle="bold"
             android:textColor="@color/colorBlack"
             android:layout_gravity="center_vertical"/>
-    </LinearLayout>
+    </LinearLayout>-->
 </LinearLayout>

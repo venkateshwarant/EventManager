@@ -26,10 +26,10 @@
                 android:layout_weight="8"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="Participants"/>
+                android:text="Filters"/>
         </LinearLayout>
         <ListView
-            android:id="@+id/participantList"
+            android:id="@+id/filterList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scrollbars="vertical">

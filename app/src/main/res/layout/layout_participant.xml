@@ -31,12 +31,4 @@
             android:textColor="@color/colorBlack"
             android:layout_gravity="center_vertical"/>
     </LinearLayout>
-    <TextView
-        android:id="@+id/comment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:textSize="14dp"
-        android:textColor="@color/colorBlack"
-        android:layout_gravity="center_vertical"/>
 </LinearLayout>
