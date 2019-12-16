@@ -51,8 +51,14 @@ public class LoginActivity extends AppCompatActivity {
                 signIn();
             }
         });
-
+        findViewById(R.id.registerBtn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(LoginActivity.this,RegistrationActivity.class));
+            }
+        });
     }
+
     private void signIn() {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id))

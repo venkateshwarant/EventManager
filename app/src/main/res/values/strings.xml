@@ -5,4 +5,23 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_create_event">CreateEventActivity</string>
+    <string name="Gender">Gender</string>
+    <string name="male">Male</string>
+    <string name="Female">Female</string>
+
+    <string name="enter_your_phone_number">Enter your phone number</string>
+    <string name="enter_your_first_name">First Name</string>
+    <string name="enter_your_last_name">Last Name</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="password">Password</string>
+    <string name="address_line_1">Address Line 1*</string>
+    <string name="postal_code">Postal Code</string>
+    <string name="country">Country</string>
+    <string name="open_country_picker">Open Country Picker</string>
+    <string name="email">Email</string>
+    <string name="your_password">your password</string>
+    <string name="Not_prefer_to_say">not prefer to say</string>
+    <string name="not_prefer_to_say">Not prefer to say</string>
+
+
 </resources>
