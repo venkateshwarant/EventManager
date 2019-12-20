@@ -357,6 +357,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                 commentObj.setComment(holder.comment.getText().toString());
                 commentObj.setCreatedTime(Long.toString(System.currentTimeMillis()));
                 commentObj.setUserID(uid);
+                commentObj.setEventID(values.get(position).eventId);
                 commentObj.setCommentID(db.push().getKey());
                 db.child(values.get(position).getEventId()).child(commentObj.getCommentID()).setValue(commentObj);
                 InputMethodManager inputManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
