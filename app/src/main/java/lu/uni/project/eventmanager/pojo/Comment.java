@@ -5,6 +5,7 @@ public class Comment {
     public String createdTime;
     public String userID;
     public String commentID;
+    public String eventID;
 
 
     public String getCommentID() {
@@ -38,4 +39,13 @@ public class Comment {
     public void setUserID(String userID) {
         this.userID = userID;
     }
+
+    public String getEventID() {
+        return eventID;
+    }
+
+    public void setEventID(String eventID) {
+        this.eventID = eventID;
+    }
+
 }

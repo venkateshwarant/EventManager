@@ -3,11 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:weightSum="500"
         android:orientation="vertical">
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -15,6 +16,7 @@
             android:layout_height="wrap_content"
             android:background="@color/colorBlack"
             android:padding="16dp"
+            android:layout_weight="1"
             android:gravity="center"
             android:orientation="horizontal">
             <TextView
@@ -29,10 +31,10 @@
                 android:text="Comments"/>
         </LinearLayout>
         <ListView
+            android:layout_weight="499"
             android:id="@+id/commentList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical">
+            android:layout_height="wrap_content">
 
         </ListView>
     </LinearLayout>
