@@ -59,6 +59,8 @@ import lu.uni.project.eventmanager.pojo.Event;
 import lu.uni.project.eventmanager.pojo.User;
 import lu.uni.project.eventmanager.util.BundleKeys;
 import lu.uni.project.eventmanager.util.ImageHelper;
+import lu.uni.project.eventmanager.util.PreferenceKeys;
+import lu.uni.project.eventmanager.util.SharedPreferencesHelper;
 
 
 public class EventsAdapter extends ArrayAdapter<Event>{
@@ -111,6 +113,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             holder.eventName= view.findViewById(R.id.eventName);
             holder.name= view.findViewById(R.id.name);
             holder.profileImage= view.findViewById(R.id.profile_image);
+            holder.profileImageComment= view.findViewById(R.id.userProfileImgComment);
             holder.detailsEventName= view.findViewById(R.id.detailsEventName);
             holder.detailsEventDescription= view.findViewById(R.id.detailsEventDescrition);
             holder.detailsEventType= view.findViewById(R.id.detailsEventType);
@@ -136,6 +139,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             holder.participantsCount= view.findViewById(R.id.participantsCount);
             holder.saveImage= view.findViewById(R.id.saveImg);
             holder.participants= view.findViewById(R.id.participants);
+            holder.viewCount= view.findViewById(R.id.viewCount);
             view.setTag(holder);
 		}else{
             holder = (ViewHolder) view.getTag();
@@ -157,6 +161,29 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         assert user != null;
         final String uid = user.getUid();
 
+
+        final DatabaseReference viewDB= FirebaseDatabase.getInstance().getReference("views").child(values.get(position).getEventId()).child(user.getUid());
+        viewDB.setValue(0);
+
+        final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("views").child(values.get(position).getEventId());
+        regDB.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                int i=0;
+                for(DataSnapshot child:dataSnapshot.getChildren()){
+                    i++;
+                }
+                holder.viewCount.setText(Integer.toString(i));
+                viewDB.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+
         final DatabaseReference userRef = database.getReference("user").child(values.get(position).getUserId());
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -166,17 +193,40 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                     holder.name.setText(user.getDisplayName());
                     RetrieveProfileImage task= new RetrieveProfileImage();
                     task.execute(user.getProfileImgURL(), holder.profileImage, context);
+                    RetrieveProfileImage task2= new RetrieveProfileImage();
+                    Object imageURI= SharedPreferencesHelper.get(getContext(), PreferenceKeys.profilePhotoURI, "");
+                    task2.execute(imageURI, holder.profileImageComment, context);
+                    final Boolean[] isRegistered = {false};
+                    DatabaseReference db= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
+                    db.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if(dataSnapshot.getValue()!=null){
+                                isRegistered[0] =true;
+                            }else{
+                                isRegistered[0] =false;
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                     holder.menuLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if(user.getUid()!=null&& FirebaseAuth.getInstance().getCurrentUser()!=null){
-                                PopupMenu popupMenu = new PopupMenu(context, holder.menuLayout);
+                                final PopupMenu popupMenu = new PopupMenu(context, holder.menuLayout);
                                 if(user.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
                                     popupMenu.getMenu().add("Delete event");
                                     popupMenu.getMenu().add("Edit event");
+                                }else if(isRegistered[0]){
+                                    popupMenu.getMenu().add("Unregister");
                                 }else{
                                     popupMenu.getMenu().add("Register");
                                 }
+
                                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                                     @Override
                                     public boolean onMenuItemClick(MenuItem item) {
@@ -223,27 +273,54 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                                             context.startActivityForResult(intent, EDIT_EVENT_REQUEST_CODE);
                                             context.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
                                         }else if(item.getTitle().toString().equals("Register")){
-                                            FirebaseAuth auth = FirebaseAuth.getInstance();
-                                            FirebaseUser user = auth.getCurrentUser();
-                                            DatabaseReference db= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId()).child(user.getUid());
-                                            db.setValue(0);
-                                            final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
-                                            regDB.addListenerForSingleValueEvent(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                                    int i=0;
-                                                    for(DataSnapshot child:dataSnapshot.getChildren()){
-                                                        i++;
-                                                    }
-                                                    holder.participantsCount.setText(Integer.toString(i));
-                                                    regDB.removeEventListener(this);
-                                                }
+                                            new AlertDialog.Builder(context)
+                                                    .setTitle("Register event?")
+                                                    .setMessage("Are you sure you want to register for this event?")
+                                                    .setPositiveButton(android.R.string.no, null)
+                                                    .setNegativeButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            FirebaseAuth auth = FirebaseAuth.getInstance();
+                                                            FirebaseUser user = auth.getCurrentUser();
+                                                            DatabaseReference db= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId()).child(user.getUid());
+                                                            db.setValue(0);
+                                                            final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
+                                                            regDB.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                                @Override
+                                                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                                    int i=0;
+                                                                    for(DataSnapshot child:dataSnapshot.getChildren()){
+                                                                        i++;
+                                                                    }
+                                                                    holder.participantsCount.setText(Integer.toString(i));
+                                                                    regDB.removeEventListener(this);
+                                                                }
 
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError databaseError) {
+                                                                @Override
+                                                                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                                                }
-                                            });
+                                                                }
+                                                            });
+                                                        }
+                                                    })
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .show();
+                                        }else if(item.getTitle().toString().equals("Unregister")){
+                                            new AlertDialog.Builder(context)
+                                                    .setTitle("Unregister event?")
+                                                    .setMessage("Are you sure you want to unregister for this event?")
+                                                    .setPositiveButton(android.R.string.no, null)
+                                                    .setNegativeButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(DialogInterface dialog, int which) {
+                                                            FirebaseAuth auth = FirebaseAuth.getInstance();
+                                                            FirebaseUser user = auth.getCurrentUser();
+                                                            final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
+                                                            regDB.removeValue();
+                                                        }
+                                                    })
+                                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                                    .show();
                                         }
                                         return false;
                                     }
@@ -266,16 +343,34 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             @Override
             public void onClick(View v) {
                 final DatabaseReference ref = database.getReference("saved").child(uid).child(values.get(position).getEventId());
-                ref.setValue(0);
-                holder.saveText.setText("Saved");
-                holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmarked));
-                Toast.makeText(context, "Event saved", Toast.LENGTH_SHORT).show();
+                ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ref.removeEventListener(this);
+                        if(dataSnapshot.getValue()==null){
+                            ref.setValue(0);
+                            holder.saveText.setText("Saved");
+                            holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmarked));
+                            Toast.makeText(context, "Event saved", Toast.LENGTH_SHORT).show();
+                        }else {
+                            ref.removeValue();
+                            holder.saveText.setText("Save");
+                            holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmark));
+                            Toast.makeText(context, "Deleted from saved events!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
             }
         });
 
 
-        final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
-        regDB.addListenerForSingleValueEvent(new ValueEventListener() {
+        final DatabaseReference regisDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
+        regisDB.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 int i=0;
@@ -283,7 +378,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                     i++;
                 }
                 holder.participantsCount.setText(Integer.toString(i));
-                regDB.removeEventListener(this);
+                regisDB.removeEventListener(this);
             }
 
             @Override
@@ -292,13 +387,16 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             }
         });
 
-        final DatabaseReference ref = database.getReference("rating").child(values.get(position).getEventId()).child(uid);
+        final DatabaseReference ref = database.getReference("rating").child(values.get(position).getEventId());
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getValue()!=null){
-                    holder.rateCount.setText(dataSnapshot.getValue().toString());
-                    holder.rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star_filled));
+                if(dataSnapshot.getChildren().iterator().hasNext()){
+                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                        holder.rateCount.setText(postSnapshot.getValue().toString());
+                        holder.rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star_filled));
+                        break;
+                    }
                 }
                 ref.removeEventListener(this);
             }
@@ -429,6 +527,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         TextView eventName;
         TextView name;
         ImageView profileImage;
+        ImageView profileImageComment;
         TextView detailsEventName;
         TextView detailsEventDescription;
         TextView detailsEventType;
@@ -447,6 +546,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         ImageView rateImage;
         TextView rateCount;
         TextView viewAllComments;
+        TextView viewCount;
         EditText comment;
         CardView eventBox;
         Button postComment;
@@ -533,12 +633,20 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 				System.out.println(e);
 			}
 			final ImageView imageView = (ImageView) urls[1];
+			ImageView imageView2 = null;
+			if(urls.length>3){
+                imageView2= (ImageView) urls[3];
+            }
 			final Bitmap finalImage = image;
             final Activity finalActivity = activity;
+            final ImageView finalImageView = imageView2;
             activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					imageView.setImageDrawable(new BitmapDrawable(finalActivity.getResources(), ImageHelper.getRoundedCornerBitmap(finalImage,2048)));
+					if(finalImageView!=null){
+                        finalImageView.setImageDrawable(new BitmapDrawable(finalActivity.getResources(), ImageHelper.getRoundedCornerBitmap(finalImage,2048)));
+                    }
 				}
 			});
 			return image;
