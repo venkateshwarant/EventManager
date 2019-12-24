@@ -27,11 +27,19 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import lu.uni.project.eventmanager.R;
 import lu.uni.project.eventmanager.activity.BottomNavigationActivity;
+import lu.uni.project.eventmanager.adapter.EventsAdapter;
+import lu.uni.project.eventmanager.fragment.HomeFragment;
 import lu.uni.project.eventmanager.pojo.Event;
 import lu.uni.project.eventmanager.util.PreferenceKeys;
 import lu.uni.project.eventmanager.util.SharedPreferencesHelper;
@@ -80,9 +88,36 @@ public class RateEventDialog extends Dialog implements
                 if (user != null) {
                     uid = user.getUid();
                 }
-                DatabaseReference db= FirebaseDatabase.getInstance().getReference("rating");
-                db.child(event.getEventId()).child(uid).setValue(ratingBar.getRating());
-                listner.onDismiss(ratingBar.getRating());
+                final DatabaseReference db= FirebaseDatabase.getInstance().getReference("rating").child(event.getEventId());
+
+                final String finalUid = db.push().getKey();
+                db.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        db.removeEventListener(this);
+                        String rateStr="";
+                        if(!dataSnapshot.getChildren().iterator().hasNext()){
+                            db.child(finalUid).setValue(ratingBar.getRating());
+                            listner.onDismiss(ratingBar.getRating());
+                        }else {
+                            for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                                rateStr = postSnapshot.getValue().toString();
+                                Float avgValue= (Float.parseFloat(rateStr)+ratingBar.getRating())/2;
+                                double roundedDouble = Math.round(avgValue * 100.0) / 100.0;
+                                float roundedFloat= (float) roundedDouble;
+                                db.child(postSnapshot.getKey()).setValue(roundedDouble);
+                                listner.onDismiss(roundedFloat);
+                                break;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+
+
                 break;
             case R.id.btn_no:
                 dismiss();
