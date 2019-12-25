@@ -8,6 +8,7 @@ public class Comment {
     public String eventID;
 
 
+
     public String getCommentID() {
         return commentID;
     }

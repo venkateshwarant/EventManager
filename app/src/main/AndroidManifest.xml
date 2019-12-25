@@ -23,8 +23,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyBr5l_bqBZWFO9W2Ys3HrNRwF0_9628KYo"/>
-        <activity android:name=".activity.CreateEventStep5"></activity>
+
+        <activity android:name=".activity.RegistrationActivity"></activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBr5l_bqBZWFO9W2Ys3HrNRwF0_9628KYo" />
+
+        <activity android:name=".activity.CreateEventStep5" />
         <activity android:name=".activity.CreateEventStep4" />
         <activity android:name=".activity.CreateEventStep3" />
         <activity android:name=".activity.CreateEventStep2" />
@@ -64,6 +70,7 @@
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
             <meta-data android:name="android.app.searchable"
+
                 android:resource="@xml/leku_searchable" />
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
