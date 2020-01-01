@@ -119,13 +119,15 @@ public class ViewCommentsAdapter extends ArrayAdapter<Comment>{
 				});
 			}
 		});
+		final String comm=values.get(position).getComment();
+		final String uid=values.get(position).getUserID();
 		final FirebaseDatabase database = FirebaseDatabase.getInstance();
 		final DatabaseReference userRef = database.getReference("user").child(values.get(position).getUserID());
 		userRef.addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 				User user= dataSnapshot.getValue(User.class);
-				if(user!=null){
+				if(user!=null& uid.contentEquals(user.getUid()) & holder.comment.getText().toString().contentEquals(values.get(position).getComment())){
 					holder.name.setText(user.getDisplayName());
 					EventsAdapter.RetrieveProfileImage task= new EventsAdapter.RetrieveProfileImage();
 					task.execute(user.getProfileImgURL(), holder.profileImage, context);

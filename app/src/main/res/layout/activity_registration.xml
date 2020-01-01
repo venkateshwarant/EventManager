@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".activity.RegistrationActivity">
 
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,21 +26,21 @@
                 android:background="@color/Orange">
 
 
-            <androidx.cardview.widget.CardView
-                app:cardCornerRadius="90dp"
-                app:cardElevation="0dp"
-                android:layout_width="180dp"
-                android:layout_height="180dp">
+                <androidx.cardview.widget.CardView
+                    app:cardCornerRadius="90dp"
+                    app:cardElevation="0dp"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp">
 
-                <ImageView
-                    tools:ignore="ContentDescription"
-                    android:id="@+id/imageToUpload"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/ic_edit_profile_img"
-                    android:scaleType="centerCrop"/>
+                    <ImageView
+                        tools:ignore="ContentDescription"
+                        android:id="@+id/imageToUpload"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_edit_profile_img"
+                        android:scaleType="centerCrop"/>
 
-            </androidx.cardview.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
             <LinearLayout
@@ -94,7 +96,7 @@
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/G-mail"
+                        android:id="@+id/mailID"
                         android:hint="Email Id"
                         android:textColorHint="@color/hint_accent_color"
                         android:textColor="@color/text_color"
@@ -113,7 +115,7 @@
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/Your_password"
+                        android:id="@+id/pwd"
                         android:hint="@string/password"
                         android:textColorHint="@color/hint_accent_color"
                         android:textColor="@color/text_color"
@@ -132,7 +134,7 @@
                     <EditText
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/Confirm_password"
+                        android:id="@+id/confirm_pwd"
                         android:hint="@string/confirm_password"
                         android:textColorHint="@color/hint_accent_color"
                         android:textColor="@color/text_color"
@@ -143,59 +145,59 @@
 
 
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="25dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="12dp"
-                android:layout_marginBottom="2dp">
-                <TextView
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/Gender"
-                    android:textColor="@color/Reg_btn_color"
-                    android:textSize="18sp"
-                    android:id="@+id/Gender_lbl3"
-                    android:layout_alignParentLeft="true"
-                    />
-
-                <RadioGroup
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/radio_group"
-                    android:layout_below="@id/Gender_lbl3">
-                    <RadioButton
+                    android:layout_marginRight="25dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginBottom="2dp">
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/radio_male"
-                        android:text="@string/male"
+                        android:text="@string/Gender"
+                        android:textColor="@color/Reg_btn_color"
                         android:textSize="18sp"
-                        android:textColor="@color/text_color"
-                        android:layout_marginLeft="50dp"
-                        android:onClick="checkButton"/>
-                    <RadioButton
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/radio_female"
-                        android:text="@string/Female"
-                        android:textSize="18sp"
-                        android:textColor="@color/text_color"
-                        android:layout_marginLeft="50dp"
-                        android:onClick="checkButton"
+                        android:id="@+id/Gender_lbl3"
+                        android:layout_alignParentLeft="true"
                         />
 
-                    <RadioButton
-                        android:id="@+id/radio_do_not_prefer_to_say"
+                    <RadioGroup
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="50dp"
-                        android:onClick="checkButton"
-                        android:text="@string/not_prefer_to_say"
-                        android:textColor="@color/text_color"
-                        android:textSize="18sp" />
-                </RadioGroup>
-            </RelativeLayout>
+                        android:id="@+id/radio_group"
+                        android:layout_below="@id/Gender_lbl3">
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radio_male"
+                            android:text="@string/male"
+                            android:textSize="18sp"
+                            android:textColor="@color/text_color"
+                            android:layout_marginLeft="50dp"
+                            android:onClick="checkButton"/>
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radio_female"
+                            android:text="@string/Female"
+                            android:textSize="18sp"
+                            android:textColor="@color/text_color"
+                            android:layout_marginLeft="50dp"
+                            android:onClick="checkButton"
+                            />
+
+                        <RadioButton
+                            android:id="@+id/radio_do_not_prefer_to_say"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="50dp"
+                            android:onClick="checkButton"
+                            android:text="@string/not_prefer_to_say"
+                            android:textColor="@color/text_color"
+                            android:textSize="18sp" />
+                    </RadioGroup>
+                </RelativeLayout>
 
 
 
@@ -302,7 +304,7 @@
 
 
                     <EditText
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:id="@+id/Phone_number"
                         android:layout_weight="2"
@@ -312,7 +314,16 @@
                         android:inputType="phone"
                         android:textSize="16sp"/>
                 </LinearLayout>
-
+                <ProgressBar
+                    android:id="@+id/progressBarHolder"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminateTintMode="src_atop"
+                    android:indeterminateTint="@color/Orange"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    android:layout_gravity="center" />
                 <Button
                     android:id="@+id/regBtn"
                     android:layout_width="wrap_content"
@@ -324,6 +335,8 @@
                     />
 
             </LinearLayout>
-        </LinearLayout>
 
+        </LinearLayout>
+    </RelativeLayout>
 </ScrollView>
+

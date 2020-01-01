@@ -5,9 +5,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -38,14 +42,62 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private static String TAG= " LoginActivity ";
     private int RC_SIGN_IN= 1;
-
+    private Button loginButton;
+    private EditText emailID;
+    private EditText pwd;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         mAuth = FirebaseAuth.getInstance();
         SignInButton signInButton = findViewById(R.id.sign_in_button);
+        loginButton = findViewById(R.id.login_button);
+        emailID = findViewById(R.id.emailID);
+        pwd = findViewById(R.id.password);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String email = emailID.getText().toString();
+                final String password = pwd.getText().toString();
+
+                if (TextUtils.isEmpty(email)) {
+                    Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (TextUtils.isEmpty(password)) {
+                    Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+//                progressBar.setVisibility(View.VISIBLE);
+
+                //authenticate user
+                mAuth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                // If sign in fails, display a message to the user. If sign in succeeds
+                                // the auth state listener will be notified and logic to handle the
+                                // signed in user can be handled in the listener.
+//                                progressBar.setVisibility(View.GONE);
+                                if (!task.isSuccessful()) {
+                                    // there was an error
+                                    if (password.length() < 6) {
+                                        Toast.makeText(getApplicationContext(), "Password is less than 6 characters!", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                    }
+                                } else {
+                                    Intent intent = new Intent(LoginActivity.this, BottomNavigationActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                }
+                            }
+                        });
+            }
+        });
 
 
         findViewById(R.id.skip).setOnClickListener(new View.OnClickListener() {
@@ -117,27 +169,17 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = mAuth.getCurrentUser();
                             DatabaseReference db= FirebaseDatabase.getInstance().getReference("user").child(user.getUid());
-                            db.child(user.getUid());
                             User userObj= new User();
                             userObj.setDisplayName(user.getDisplayName());
                             userObj.setUid(user.getUid());
-//                            ArrayList<String> eId= new ArrayList();
-//                            eId.add(user.getEmail());
-//                            userObj.setEmailID(eId);
                             userObj.setEmailID(user.getEmail());
-//                            ArrayList<String> pNo= new ArrayList();
-//                            pNo.add(user.getPhoneNumber());
-//                            userObj.setPhoneNumber(pNo);
                             userObj.setPhoneNumber(user.getPhoneNumber());
                             userObj.setProfileImgURL(user.getPhotoUrl().toString());
                             db.setValue(userObj);
-
                             startBottomoNavActivity();
                         } else {
-                            // If sign in fails, display a message to the user.
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
-//                            Snackbar.make(findViewById(R.id.main_layout), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
-//                            updateUI(null);
+                            Toast.makeText(getApplicationContext(),"Signin failed!",Toast.LENGTH_LONG).show();
                         }
 
                         // ...
