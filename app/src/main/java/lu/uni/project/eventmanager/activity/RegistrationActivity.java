@@ -5,11 +5,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
+import android.graphics.Rect;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -36,6 +45,8 @@ import com.ybs.countrypicker.CountryPickerListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import lu.uni.project.eventmanager.R;
 import lu.uni.project.eventmanager.pojo.User;
@@ -93,7 +104,8 @@ private static final int RESULT_LOAD_IMAGE = 1;
         outAnimation = new AlphaAnimation(1f, 0f);
         outAnimation.setDuration(200);
         init();
-
+        setupUI(findViewById(R.id.registerParent));
+        changeStatusBarColor(RegistrationActivity.this);
         findViewById(R.id.regBtn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +151,7 @@ private static final int RESULT_LOAD_IMAGE = 1;
                                         try {
                                             StorageReference storage= FirebaseStorage.getInstance().getReference();
                                             StorageReference imgRef= storage.child("images").child("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                                            FileInputStream profileImg = new FileInputStream(new File(imageURI.getPath()));
+                                            InputStream profileImg = getContentResolver().openInputStream(imageURI);
 
                                             final StorageReference img= imgRef.child("user.jpg");
                                             UploadTask uploadTask = img.putStream(profileImg);
@@ -157,9 +169,13 @@ private static final int RESULT_LOAD_IMAGE = 1;
                                                                 User userObj= new User();
                                                                 userObj.setDisplayName(inputFirstName.getText()+" "+inputLastName.getText());
                                                                 userObj.setFirstName(inputFirstName.getText().toString());
-                                                                String address= addressLine1.getText()+"\n"+addressLine2.getText()+"\nPostal code:"+postalCode.getText().toString();
+                                                                String address= addressLine1.getText()+"\n"+addressLine2.getText();
                                                                 userObj.setAddress(address);
-                                                                userObj.setPhoneNumber(phoneNumber.getText().toString());
+                                                                RadioButton radButton = findViewById(radioGroup.getCheckedRadioButtonId());
+                                                                userObj.setGender(radButton.getText().toString());
+                                                                userObj.setPostalCode(postalCode.getText().toString());
+                                                                userObj.setLastName(inputLastName.getText().toString());
+                                                                userObj.setPhoneNumber(ccp.getSelectedCountryCodeWithPlus()+phoneNumber.getText().toString());
                                                                 userObj.setEmailID(email);
                                                                 userObj.setUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
                                                                 userObj.setProfileImgURL(imgDownloadURL[0]);
@@ -195,7 +211,6 @@ private static final int RESULT_LOAD_IMAGE = 1;
                                         db.setValue(userObj);
 
                                         Toast.makeText(RegistrationActivity.this, "Registered succesfully!", Toast.LENGTH_SHORT).show();
-
 
                                         progressBarHolder.setAnimation(outAnimation);
                                         progressBarHolder.setVisibility(View.GONE);
@@ -262,7 +277,20 @@ private static final int RESULT_LOAD_IMAGE = 1;
         if(requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && data !=null) {
             imageURI = data.getData();
             imageToUpload.setImageURI(imageURI);
+            imageToUpload.invalidate();
+        }
+    }
 
+    public void changeStatusBarColor(Activity activity) {
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(activity.getResources().getColor(R.color.Orange));
+            View decorView = window.getDecorView();
+            int systemUiVisibilityFlags = decorView.getSystemUiVisibility();
+            systemUiVisibilityFlags = systemUiVisibilityFlags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            decorView.setSystemUiVisibility(systemUiVisibilityFlags);
         }
     }
     public static void hideKeyboard(Activity activity) {
@@ -274,5 +302,29 @@ private static final int RESULT_LOAD_IMAGE = 1;
             view = new View(activity);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        if(activity!=null & activity.getCurrentFocus()!=null){
+            InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(
+                    Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+    public void setupUI(View view) {
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(RegistrationActivity.this);
+                    return false;
+                }
+            });
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView);
+            }
+        }
     }
 }
