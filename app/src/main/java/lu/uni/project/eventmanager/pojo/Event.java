@@ -18,6 +18,8 @@ public class Event implements Serializable {
     public String userId="";
     public Location location= new Location();
     public int imagesCount= 0;
+    public int videosCount= 0;
+    public String videosDownloadURL;
     public Event() {
     }
 
@@ -130,4 +132,38 @@ public class Event implements Serializable {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public String getImages() {
+        return images;
+    }
+
+    public void setImages(String images) {
+        this.images = images;
+    }
+
+    public int getImagesCount() {
+        return imagesCount;
+    }
+
+    public void setImagesCount(int imagesCount) {
+        this.imagesCount = imagesCount;
+    }
+
+    public int getVideosCount() {
+        return videosCount;
+    }
+
+    public void setVideosCount(int videosCount) {
+        this.videosCount = videosCount;
+    }
+
+
+    public String getVideosDownloadURL() {
+        return videosDownloadURL;
+    }
+
+    public void setVideosDownloadURL(String videosDownloadURL) {
+        this.videosDownloadURL = videosDownloadURL;
+    }
+
 }

@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,13 +24,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -98,6 +106,16 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         return imgRefList;
     }
 
+    public List<StorageReference> getEventVideooStorageReference(Event event){
+        final List<StorageReference> imgRefList= new ArrayList<>();
+        for(int i=0; i<event.getVideosCount(); i++){
+            StorageReference mStorageRef = FirebaseStorage.getInstance().getReference();
+            final StorageReference imgRef = mStorageRef.child("videos/"+event.getEventId()+"/"+i);
+            imgRefList.add(imgRef);
+        }
+        return imgRefList;
+    }
+
 	@Override
 	public int getCount() {
 		return count;
@@ -140,6 +158,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             holder.saveImage= view.findViewById(R.id.saveImg);
             holder.participants= view.findViewById(R.id.participants);
             holder.viewCount= view.findViewById(R.id.viewCount);
+            holder.videoView= view.findViewById(R.id.videoView);
             view.setTag(holder);
 		}else{
             holder = (ViewHolder) view.getTag();
@@ -154,17 +173,43 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         holder.detailsContactPhoneNumber.setText("");
         holder.detailsAddress.setText(values.get(position).getLocation().getAddress());
         holder.detailsVenue.setText(values.get(position).getLocation().getVenueDetails());
-
+        holder.rateCount.setVisibility(View.INVISIBLE);
+        holder.rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star));
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();
-        assert user != null;
-        final String uid = user.getUid();
+        String uid ="";
+        if(user!=null){
+            uid= user.getUid();
+        }
 
+        final DatabaseReference ref = database.getReference("rating").child(values.get(position).getEventId());
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.getChildren().iterator().hasNext()){
+                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                        if(!postSnapshot.getValue().equals(0) & holder.eventName.getText().toString().contentEquals(values.get(position).getEventName())){
+                            holder.rateCount.setVisibility(View.VISIBLE);
+                            holder.rateCount.setText(postSnapshot.getValue().toString());
+                            holder.rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star_filled));
+                            break;
+                        }
+                    }
+                }
+                ref.removeEventListener(this);
+            }
 
-        final DatabaseReference viewDB= FirebaseDatabase.getInstance().getReference("views").child(values.get(position).getEventId()).child(user.getUid());
-        viewDB.setValue(0);
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+
+        if(user!=null){
+            final DatabaseReference viewDB= FirebaseDatabase.getInstance().getReference("views").child(values.get(position).getEventId()).child(user.getUid());
+            viewDB.setValue(0);
+        }
         final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("views").child(values.get(position).getEventId());
         regDB.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -174,7 +219,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                     i++;
                 }
                 holder.viewCount.setText(Integer.toString(i));
-                viewDB.removeEventListener(this);
+                regDB.removeEventListener(this);
             }
 
             @Override
@@ -184,12 +229,14 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         });
 
 
+
+
         final DatabaseReference userRef = database.getReference("user").child(values.get(position).getUserId());
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 final User user= dataSnapshot.getValue(User.class);
-                if(user!=null){
+                if(user!=null & holder.eventName.getText().toString().contentEquals(values.get(position).getEventName())){
                     holder.name.setText(user.getDisplayName());
                     RetrieveProfileImage task= new RetrieveProfileImage();
                     task.execute(user.getProfileImgURL(), holder.profileImage, context);
@@ -339,34 +386,39 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             }
         });
 
-        holder.save.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final DatabaseReference ref = database.getReference("saved").child(uid).child(values.get(position).getEventId());
-                ref.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        ref.removeEventListener(this);
-                        if(dataSnapshot.getValue()==null){
-                            ref.setValue(0);
-                            holder.saveText.setText("Saved");
-                            holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmarked));
-                            Toast.makeText(context, "Event saved", Toast.LENGTH_SHORT).show();
-                        }else {
-                            ref.removeValue();
-                            holder.saveText.setText("Save");
-                            holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmark));
-                            Toast.makeText(context, "Deleted from saved events!", Toast.LENGTH_SHORT).show();
+        final String finalUid = uid;
+        if(finalUid!=""){
+            holder.save.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    final DatabaseReference ref = database.getReference("saved").child(finalUid).child(values.get(position).getEventId());
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            ref.removeEventListener(this);
+                            if(dataSnapshot.getValue()==null){
+                                ref.setValue(0);
+                                holder.saveText.setText("Saved");
+                                holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmarked));
+                                Toast.makeText(context, "Event saved", Toast.LENGTH_SHORT).show();
+                            }else {
+                                ref.removeValue();
+                                holder.saveText.setText("Save");
+                                holder.saveImage.setImageDrawable(context.getDrawable(R.drawable.ic_bookmark));
+                                Toast.makeText(context, "Deleted from saved events!", Toast.LENGTH_SHORT).show();
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
-            }
-        });
+                        }
+                    });
+                }
+            });
+        }else{
+            holder.save.setVisibility(View.INVISIBLE);
+        }
 
 
         final DatabaseReference regisDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
@@ -387,25 +439,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             }
         });
 
-        final DatabaseReference ref = database.getReference("rating").child(values.get(position).getEventId());
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.getChildren().iterator().hasNext()){
-                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                        holder.rateCount.setText(postSnapshot.getValue().toString());
-                        holder.rateImage.setImageDrawable(context.getDrawable(R.drawable.ic_star_filled));
-                        break;
-                    }
-                }
-                ref.removeEventListener(this);
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
         final DatabaseReference saveRef = database.getReference("saved").child(uid);
                 saveRef.addValueEventListener(new ValueEventListener() {
                     @Override
@@ -491,7 +525,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         holder.rateEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(context!=null){
+                if(context!=null&holder.eventName.getText().toString().contentEquals(values.get(position).getEventName())){
                     RateEventDialog rateEventDiaog= new RateEventDialog(context, values.get(position), new RateEventDialog.DismisListner() {
                         @Override
                         public void onDismiss(float rating) {
@@ -504,6 +538,32 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             }
         });
         View eventDetailsHolder= view.findViewById(R.id.eventDetails);
+        holder.videoView.setVisibility(View.GONE);
+
+//        final VideoView videoView= view.findViewById(R.id.videoView);
+        if(holder.eventName.getText().toString().contentEquals(values.get(position).getEventName())){
+            List<StorageReference> stor= getEventVideooStorageReference(values.get(position));
+
+            if(values.get(position).getVideosCount()>0){
+                holder.videoView.setVisibility(View.VISIBLE);
+                holder.videoView.setVideoURI(Uri.parse(values.get(position).getVideosDownloadURL()));
+                holder.videoView.requestFocus();
+                holder.videoView.start();
+                holder.videoView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(holder.videoView.isPlaying()){
+                            holder.videoView.pause();
+                        }else{
+                            holder.videoView.start();
+                        }
+                    }
+                });
+            }
+        }
+
+//        ViewPager multimediaVP= view.findViewById(R.id.multimediaViewPager);
+//        multimediaVP.setAdapter(new MultimediaAdapter(context.getSupportFragmentManager(),getEventImageStorageReference(values.get(position))));
         SliderView imageSlider= view.findViewById(R.id.imageSlider);
         imageSlider.setSliderAdapter(new SliderAdapter(context, getEventImageStorageReference(values.get(position)), true));
         eventDetailsHolder.setOnClickListener(new View.OnClickListener() {
@@ -554,6 +614,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         TextView saveText;
         TextView participantsCount;
         ImageView saveImage;
+        VideoView videoView;
     }
 
 
@@ -640,15 +701,17 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 			final Bitmap finalImage = image;
             final Activity finalActivity = activity;
             final ImageView finalImageView = imageView2;
-            activity.runOnUiThread(new Runnable() {
-				@Override
-				public void run() {
-					imageView.setImageDrawable(new BitmapDrawable(finalActivity.getResources(), ImageHelper.getRoundedCornerBitmap(finalImage,2048)));
-					if(finalImageView!=null){
-                        finalImageView.setImageDrawable(new BitmapDrawable(finalActivity.getResources(), ImageHelper.getRoundedCornerBitmap(finalImage,2048)));
+            if(activity!=null){
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        imageView.setImageDrawable(new BitmapDrawable(finalActivity.getResources(), ImageHelper.getRoundedCornerBitmap(finalImage,2048)));
+                        if(finalImageView!=null){
+                            finalImageView.setImageDrawable(new BitmapDrawable(finalActivity.getResources(), ImageHelper.getRoundedCornerBitmap(finalImage,2048)));
+                        }
                     }
-				}
-			});
+                });
+            }
 			return image;
 		}
 

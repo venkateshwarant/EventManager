@@ -46,7 +46,7 @@ class CreateEventStep3 : AppCompatActivity(),  BSImagePicker.OnSingleImageSelect
         next.setOnClickListener{
             var event= intent.extras
             event?.putString(BundleKeys.imagesListKey, imagesList.toString())
-            var intent= Intent(this, CreateEventStep4::class.java)
+            var intent= Intent(this, CreateEventVideoStep::class.java)
             intent.putExtras( event!!)
             startActivity(intent)
             this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)

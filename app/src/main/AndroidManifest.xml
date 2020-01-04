@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="lu.uni.project.eventmanager">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -33,8 +32,12 @@
         <activity android:name=".activity.CreateEventStep5" />
         <activity android:name=".activity.CreateEventStep4" />
         <activity android:name=".activity.CreateEventStep3" />
+        <activity android:name=".activity.CreateEventVideoStep" />
         <activity android:name=".activity.CreateEventStep2" />
-
+        <activity
+            android:name="com.anilokcun.uwmediapicker.ui.activity.UwMediaPickerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="lu.uni.project.eventmanager.fileprovider"

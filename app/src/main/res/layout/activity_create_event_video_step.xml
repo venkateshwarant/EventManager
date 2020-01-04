@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="26"
-    tools:context=".activity.CreateEventStep3"
+    tools:context=".activity.CreateEventVideoStep"
     android:orientation="vertical">
     <androidx.cardview.widget.CardView
         android:id="@+id/titleCardView"
@@ -47,7 +47,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Upload images / posters"
+                android:text="Upload videos"
                 android:layout_weight="8"
                 android:textColor="@color/colorWhite"
                 android:textSize="18dp"
@@ -78,6 +78,9 @@
     </androidx.cardview.widget.CardView>
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:padding="16dp"
         android:id="@+id/step1"
         android:layout_weight="21"
@@ -95,7 +98,7 @@
             android:layout_marginTop="16dp"
             android:textStyle="bold"
             android:background="@android:color/transparent"
-            android:text="Step 3 of 5"/>
+            android:text="Step 4 of 6"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -105,30 +108,27 @@
             android:gravity="center"
             >
             <Button
-                android:id="@+id/uploadImageButton"
+                android:id="@+id/uploadVideoButton"
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorButtonBlack"
                 android:padding="8dp"
                 android:textSize="10dp"
-                android:drawableRight="@drawable/ic_upload_images"
+                android:drawableRight="@drawable/ic_video"
                 android:background="@drawable/shape_black_button"
-                android:text="Upload Images      "/>
+                android:text="Upload Videos      "/>
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
-                android:layout_margin="16dp"
                 app:cardCornerRadius="8dp">
-
                 <VideoView
                     android:id="@+id/videoView"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="wrap_content"
                     android:visibility="gone" />
-
-                <com.smarteist.autoimageslider.SliderView
+                <!--<com.smarteist.autoimageslider.SliderView
                     android:id="@+id/imageSlider"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
@@ -144,11 +144,9 @@
                     app:sliderIndicatorRadius="2dp"
                     app:sliderIndicatorSelectedColor="#5A5A5A"
                     app:sliderIndicatorUnselectedColor="#FFF"
-                    app:sliderScrollTimeInSec="5" />
+                    app:sliderScrollTimeInSec="5" />-->
 
             </androidx.cardview.widget.CardView>
-
-
         </LinearLayout>
 
     </LinearLayout>

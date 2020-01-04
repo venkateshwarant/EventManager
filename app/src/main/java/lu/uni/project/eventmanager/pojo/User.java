@@ -13,6 +13,9 @@ public class User {
     public String emailID;
     public String address;
     public String profileImgURL;
+    public String country;
+    public String postalCode;
+    public String gender;
 
     public String getUid() {
         return uid;
@@ -77,4 +80,29 @@ public class User {
     public void setProfileImgURL(String profileImgURL) {
         this.profileImgURL = profileImgURL;
     }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
 }

@@ -127,10 +127,12 @@ public class ViewCommentsAdapter extends ArrayAdapter<Comment>{
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 				User user= dataSnapshot.getValue(User.class);
-				if(user!=null& uid.contentEquals(user.getUid()) & holder.comment.getText().toString().contentEquals(values.get(position).getComment())){
+				if(user!=null&&!uid.isEmpty()&& uid.contentEquals(user.getUid()) &&holder.comment.getText().toString().contentEquals(values.get(position).getComment())){
 					holder.name.setText(user.getDisplayName());
 					EventsAdapter.RetrieveProfileImage task= new EventsAdapter.RetrieveProfileImage();
 					task.execute(user.getProfileImgURL(), holder.profileImage, context);
+				}else if(user!=null&uid.isEmpty()& holder.comment.getText().toString().contentEquals(values.get(position).getComment())){
+					holder.name.setText("Annonymous");
 				}
 				userRef.removeEventListener(this);
 			}

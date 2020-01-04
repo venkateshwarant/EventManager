@@ -26,14 +26,11 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import lu.uni.project.eventmanager.R;
 import lu.uni.project.eventmanager.activity.LoginActivity;
 import lu.uni.project.eventmanager.util.ImageHelper;
 import lu.uni.project.eventmanager.util.PreferenceKeys;
 import lu.uni.project.eventmanager.util.SharedPreferencesHelper;
-
-import static android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
 
 public class UserFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
@@ -69,33 +66,42 @@ public class UserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root= inflater.inflate(R.layout.fragment_user, container, false);
         if(getContext()!=null){
-            ImageLoader imageLoader = ImageLoader.getInstance();
-            ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getActivity()));
-            Object imageURI= SharedPreferencesHelper.get(getContext(), PreferenceKeys.profilePhotoURI, "");
-            imageLoader.loadImage(imageURI.toString(), new SimpleImageLoadingListener() {
-                @Override
-                public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                    if(getContext()!=null){
-                        BitmapDrawable ob = new BitmapDrawable(getResources(), ImageHelper.getRoundedCornerBitmap(loadedImage,2048));
-                        ImageView profileImage= root.findViewById(R.id.profile_image);
-                        profileImage.setImageDrawable(ob);
+            if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+                ImageLoader imageLoader = ImageLoader.getInstance();
+                ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getActivity()));
+                Object imageURI= SharedPreferencesHelper.get(getContext(), PreferenceKeys.profilePhotoURI, "");
+                imageLoader.loadImage(imageURI.toString(), new SimpleImageLoadingListener() {
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        if(getContext()!=null){
+                            BitmapDrawable ob = new BitmapDrawable(getResources(), ImageHelper.getRoundedCornerBitmap(loadedImage,2048));
+                            ImageView profileImage= root.findViewById(R.id.profile_image);
+                            profileImage.setImageDrawable(ob);
+                        }
                     }
-                }
-            });
-            root.findViewById(R.id.logoutBtn).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    FirebaseAuth.getInstance().signOut();
-                    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                            .requestIdToken(getString(R.string.default_web_client_id))
-                            .requestEmail()
-                            .build();
-                    GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-                    mGoogleSignInClient.signOut();
-                    getActivity().startActivity(new Intent(getContext(), LoginActivity.class));
-                    getActivity().finish();
-                }
-            });
+                });
+                root.findViewById(R.id.logoutBtn).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        SharedPreferencesHelper.remove(getContext().getApplicationContext(), PreferenceKeys.profilePhotoURI);
+                        SharedPreferencesHelper.remove(getContext().getApplicationContext(), PreferenceKeys.profileFirstName);
+                        SharedPreferencesHelper.remove(getContext().getApplicationContext(), PreferenceKeys.profileLastName);
+                        SharedPreferencesHelper.remove(getContext().getApplicationContext(), PreferenceKeys.profileDisplayName);
+                        FirebaseAuth.getInstance().signOut();
+                        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .requestIdToken(getString(R.string.default_web_client_id))
+                                .requestEmail()
+                                .build();
+                        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
+                        mGoogleSignInClient.signOut();
+                        getActivity().startActivity(new Intent(getContext(), LoginActivity.class));
+                        getActivity().finish();
+                    }
+                });
+            }else{
+                startActivity(new Intent(getActivity(),LoginActivity.class));
+                getActivity().finish();
+            }
         }
         changeStatusBarColor(getActivity());
         return root;

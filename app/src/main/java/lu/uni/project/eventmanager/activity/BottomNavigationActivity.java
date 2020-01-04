@@ -21,8 +21,10 @@ import androidx.fragment.app.FragmentTransaction;
 import lu.uni.project.eventmanager.R;
 import lu.uni.project.eventmanager.fragment.HeartFragment;
 import lu.uni.project.eventmanager.fragment.HomeFragment;
+import lu.uni.project.eventmanager.fragment.ImageFragment;
 import lu.uni.project.eventmanager.fragment.SearchFragment;
 import lu.uni.project.eventmanager.fragment.UserFragment;
+import lu.uni.project.eventmanager.fragment.VideoFragment;
 import lu.uni.project.eventmanager.util.BundleKeys;
 
 public class BottomNavigationActivity extends AppCompatActivity implements
@@ -30,7 +32,9 @@ public class BottomNavigationActivity extends AppCompatActivity implements
         HomeFragment.OnFragmentInteractionListener,
         SearchFragment.OnFragmentInteractionListener,
         HeartFragment.OnFragmentInteractionListener,
-        UserFragment.OnFragmentInteractionListener{
+        UserFragment.OnFragmentInteractionListener,
+        ImageFragment.OnFragmentInteractionListener,
+        VideoFragment.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

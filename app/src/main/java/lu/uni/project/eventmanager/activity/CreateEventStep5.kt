@@ -5,7 +5,6 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Bitmap
 import android.location.Address
 import android.net.Uri
 import android.os.AsyncTask
@@ -17,7 +16,6 @@ import android.view.WindowManager
 import android.view.animation.AlphaAnimation
 import android.widget.FrameLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toFile
 import com.google.firebase.auth.FirebaseAuth
@@ -26,15 +24,13 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.schibstedspain.leku.*
 import kotlinx.android.synthetic.main.activity_create_event_step5.*
+import lu.uni.project.eventmanager.R
 import lu.uni.project.eventmanager.pojo.Event
 import lu.uni.project.eventmanager.pojo.Location
 import lu.uni.project.eventmanager.util.BundleKeys
-import lu.uni.project.eventmanager.R
 import lu.uni.project.eventmanager.util.GlobalUtil
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
-import java.util.concurrent.TimeUnit
 
 
 class CreateEventStep5 : AppCompatActivity() {
@@ -46,6 +42,7 @@ class CreateEventStep5 : AppCompatActivity() {
     var inAnimation: AlphaAnimation? = null
     var outAnimation: AlphaAnimation? = null
     var progressBarHolder: FrameLayout? = null
+    var eventObj:Event?= null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_event_step5)
@@ -67,26 +64,52 @@ class CreateEventStep5 : AppCompatActivity() {
             event?.putString(BundleKeys.longitudeKey, lon)
             event?.putString(BundleKeys.zipcodeKey, zipc)
 
-            var eventObj= Event()
-            eventObj.eventName=event?.getString(BundleKeys.eventNameKey)
-            eventObj.eventDescription=event?.getString(BundleKeys.eventDescriptionKey)
-            eventObj.eventCategory=event?.getString(BundleKeys.eventCategoryKey)
-            eventObj.startTime=event?.getString(BundleKeys.startTimeKey)
-            eventObj.startTime=event?.getString(BundleKeys.startTimeKey)
-            eventObj.endTime=event?.getString(BundleKeys.endTimeKey)
-            eventObj.startDate=event?.getString(BundleKeys.startDateKey)
-            eventObj.endDate=event?.getString(BundleKeys.endDateKey)
-            eventObj.images=event?.getString(BundleKeys.imagesListKey)
-            eventObj.location= Location()
-            eventObj.location.setAddress(addr)
-            eventObj.location.setLatitude(lat)
-            eventObj.location.setLongitude(lon)
-            eventObj.location.zipCode= zipc
-            eventObj.location.venueDetails=findViewById<TextView>(R.id.venueDetails).text.toString()
-            eventObj.setUserId(FirebaseAuth.getInstance().currentUser?.uid)
-            eventObj.setCreatedTime(System.currentTimeMillis().toString())
+            eventObj= Event()
+            eventObj?.eventName=event?.getString(BundleKeys.eventNameKey)
+            eventObj?.eventDescription=event?.getString(BundleKeys.eventDescriptionKey)
+            eventObj?.eventCategory=event?.getString(BundleKeys.eventCategoryKey)
+            eventObj?.startTime=event?.getString(BundleKeys.startTimeKey)
+            eventObj?.startTime=event?.getString(BundleKeys.startTimeKey)
+            eventObj?.endTime=event?.getString(BundleKeys.endTimeKey)
+            eventObj?.startDate=event?.getString(BundleKeys.startDateKey)
+            eventObj?.endDate=event?.getString(BundleKeys.endDateKey)
+            eventObj?.images=event?.getString(BundleKeys.imagesListKey)
+            eventObj?.location= Location()
+            eventObj?.location?.setAddress(addr)
+            eventObj?.location?.setLatitude(lat)
+            eventObj?.location?.setLongitude(lon)
+            eventObj?.location?.zipCode= zipc
+            eventObj?.location?.venueDetails=findViewById<TextView>(R.id.venueDetails).text.toString()
+            eventObj?.setUserId(FirebaseAuth.getInstance().currentUser?.uid)
+            eventObj?.setCreatedTime(System.currentTimeMillis().toString())
             intent.putExtras(event!!)
-            UpdateTask().execute(eventObj as Object, this as Object)
+
+
+
+            val storage = FirebaseStorage.getInstance()
+            var storageRef = storage.reference
+            var db= FirebaseDatabase.getInstance().getReference("event")
+            if(intent?.extras?.get(BundleKeys.editEventKey)=="true"){
+                eventObj?.eventId = intent?.extras?.get(BundleKeys.eventIDKey).toString()
+            }else{
+                var key= db.push().key!!
+                eventObj?.eventId = key
+            }
+
+            var videoRef: StorageReference? = storageRef.child("videos").child(eventObj?.eventId+"")
+            val stream = File(GlobalUtil.videoList!![0].toString()).inputStream()
+            var vid= videoRef?.child("0")
+            var uploadTask = vid?.putStream(stream!!)
+            uploadTask?.addOnFailureListener {
+                // Handle unsuccessful uploads
+            }?.addOnSuccessListener {
+                vid?.downloadUrl?.addOnCompleteListener{
+                    eventObj?.setVideosDownloadURL(it.result.toString())
+                    UpdateTask().execute(eventObj as Object, this as Object)
+                }
+            }
+
+
 
 
 
@@ -219,13 +242,9 @@ class CreateEventStep5 : AppCompatActivity() {
                 }
                 var event=params[0] as Event
                 var activity=params[1] as Activity
-                if(activity?.intent?.extras?.get(BundleKeys.editEventKey)=="true"){
-                    event.eventId = activity?.intent?.extras?.get(BundleKeys.eventIDKey).toString()
-                }else{
-                    var key= db.push().key!!
-                    event.eventId = key
-                }
+
                 event.imagesCount = GlobalUtil.imagesList?.size!!
+                event.videosCount = GlobalUtil.videoList?.size!!
                 db.child(event.eventId).setValue(event)
                 val storage = FirebaseStorage.getInstance()
                 var storageRef = storage.reference
@@ -241,6 +260,9 @@ class CreateEventStep5 : AppCompatActivity() {
                         // ...
                     }
                 }
+
+
+
                 var intent= Intent(this@CreateEventStep5, BottomNavigationActivity::class.java)
                 intent.putExtra("event_created","true")
                 if(activity?.intent?.extras?.get(BundleKeys.editEventKey)=="true"){
