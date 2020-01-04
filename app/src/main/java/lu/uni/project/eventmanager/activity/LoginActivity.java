@@ -2,12 +2,21 @@ package lu.uni.project.eventmanager.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,12 +35,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
 import lu.uni.project.eventmanager.R;
+import lu.uni.project.eventmanager.adapter.EventsAdapter;
 import lu.uni.project.eventmanager.pojo.User;
 import lu.uni.project.eventmanager.util.PreferenceKeys;
 import lu.uni.project.eventmanager.util.SharedPreferencesHelper;
@@ -45,6 +58,7 @@ public class LoginActivity extends AppCompatActivity {
     private Button loginButton;
     private EditText emailID;
     private EditText pwd;
+    private boolean pwdState;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +69,27 @@ public class LoginActivity extends AppCompatActivity {
         emailID = findViewById(R.id.emailID);
         pwd = findViewById(R.id.password);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
+        changeStatusBarColor(this);
+        pwd.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_RIGHT = 2;
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (pwd.getRight() - pwd.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                       if(pwdState){
+                           pwd.setTransformationMethod(new PasswordTransformationMethod());
+                           pwd.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_hide), null);
+                       }else{
+                           pwd.setTransformationMethod(null);
+                           pwd.setCompoundDrawablesWithIntrinsicBounds(null, null, ContextCompat.getDrawable(getApplicationContext(),R.drawable.ic_remove_red_eye_black_24dp), null);
+                       }
+                        pwdState=!pwdState;
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,20 +105,30 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-//                progressBar.setVisibility(View.VISIBLE);
-
-                //authenticate user
                 mAuth.signInWithEmailAndPassword(email, password)
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                // If sign in fails, display a message to the user. If sign in succeeds
-                                // the auth state listener will be notified and logic to handle the
-                                // signed in user can be handled in the listener.
-//                                progressBar.setVisibility(View.GONE);
+                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                final DatabaseReference userRef = database.getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                userRef.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        User user= dataSnapshot.getValue(User.class);
+                                        if(user!=null){
+                                            SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profilePhotoURI, user.getProfileImgURL()!=null?user.getProfileImgURL():"");
+                                            SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileFirstName,user.getFirstName()!=null?user.getFirstName():"");
+                                            SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileLastName, user.getLastName()!=null?user.getLastName():"");
+                                            SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileDisplayName, user.getDisplayName()!=null?user.getDisplayName():"");
+                                        }
+                                        userRef.removeEventListener(this);
+                                    }
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
                                 if (!task.isSuccessful()) {
-                                    // there was an error
                                     if (password.length() < 6) {
                                         Toast.makeText(getApplicationContext(), "Password is less than 6 characters!", Toast.LENGTH_SHORT).show();
                                     } else {
@@ -122,6 +167,7 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(new Intent(LoginActivity.this,RegistrationActivity.class));
             }
         });
+        setupUI(findViewById(R.id.loginParent));
     }
 
     private void signIn() {
@@ -137,12 +183,9 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
-                // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profilePhotoURI, account.getPhotoUrl());
                 SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileFirstName, account.getGivenName());
@@ -158,7 +201,6 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
         Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -181,13 +223,46 @@ public class LoginActivity extends AppCompatActivity {
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Toast.makeText(getApplicationContext(),"Signin failed!",Toast.LENGTH_LONG).show();
                         }
-
-                        // ...
                     }
                 });
     }
     public void startBottomoNavActivity(){
         startActivity(new Intent(this, BottomNavigationActivity.class));
         finish();
+    }
+    public void changeStatusBarColor(Activity activity) {
+        Window window = activity.getWindow();
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            window.setStatusBarColor(activity.getResources().getColor(R.color.colorWhite));
+            View decorView = window.getDecorView();
+            int systemUiVisibilityFlags = decorView.getSystemUiVisibility();
+            systemUiVisibilityFlags = systemUiVisibilityFlags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
+            decorView.setSystemUiVisibility(systemUiVisibilityFlags);
+        }
+    }
+    public static void hideSoftKeyboard(Activity activity) {
+        if(activity!=null & activity.getCurrentFocus()!=null){
+            InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(
+                    Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+    public void setupUI(View view) {
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(LoginActivity.this);
+                    return false;
+                }
+            });
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView);
+            }
+        }
     }
 }
