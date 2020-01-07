@@ -1,7 +1,9 @@
 package lu.uni.project.eventmanager.fragment;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -39,8 +42,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lu.uni.project.eventmanager.R;
+import lu.uni.project.eventmanager.activity.EditProfileActivity;
 import lu.uni.project.eventmanager.activity.LoginActivity;
 import lu.uni.project.eventmanager.activity.MyEventsActivity;
+import lu.uni.project.eventmanager.activity.RegistrationActivity;
 import lu.uni.project.eventmanager.activity.SavedEventsActivity;
 import lu.uni.project.eventmanager.pojo.Event;
 import lu.uni.project.eventmanager.pojo.User;
@@ -72,6 +77,7 @@ public class UserFragment extends Fragment {
                 ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getActivity()));
                 Object imageURI= SharedPreferencesHelper.get(getContext(), PreferenceKeys.profilePhotoURI, "");
                 imageLoader.loadImage(imageURI.toString(), new SimpleImageLoadingListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.DONUT)
                     @Override
                     public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
                         if(getContext()!=null){
@@ -101,7 +107,7 @@ public class UserFragment extends Fragment {
                 });
 
                 final FirebaseDatabase database = FirebaseDatabase.getInstance();
-                final DatabaseReference ref = database.getReference("user").child(FirebaseAuth.getInstance().getUid());
+                final DatabaseReference ref = database.getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 ref.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -182,7 +188,26 @@ public class UserFragment extends Fragment {
 
                     }
                 });
+                root.findViewById(R.id.editProfile).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DialogInterface.OnClickListener listener= new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent intent= new Intent(getActivity(), EditProfileActivity.class);
+                                startActivity(intent);
+                            }
+                        };
 
+                        new AlertDialog.Builder(getContext())
+                                .setTitle("Edit profile?")
+                                .setMessage("Are you sure you want to edit your profile?")
+                                .setPositiveButton(android.R.string.yes, listener)
+                                .setNegativeButton(android.R.string.no, null)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
+                    }
+                });
 
             }else{
                 startActivity(new Intent(getActivity(),LoginActivity.class));

@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/registerParent"
+    tools:context=".activity.RegistrationActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:background="@color/Back_reg_color">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:padding="40dp"
+                android:background="@color/Orange">
+
+                <androidx.cardview.widget.CardView
+                    app:cardCornerRadius="90dp"
+                    app:cardElevation="0dp"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp">
+
+                    <ImageView
+                        tools:ignore="ContentDescription"
+                        android:id="@+id/imageToUpload"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_edit_profile_img"
+                        android:scaleType="centerCrop"/>
+
+                </androidx.cardview.widget.CardView>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="30dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/Reg_btn_color"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true">
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/First_name_Text1"
+                        android:hint="@string/enter_your_first_name"
+
+                        android:inputType="textPersonName"
+                        android:textSize="18sp"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/Reg_btn_color"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true">
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/Last_name_Text2"
+                        android:layout_below="@id/First_name_Text1"
+                        android:hint="@string/enter_your_last_name"
+                        android:textColorHint="@color/hint_accent_color"
+                        android:textSize="18sp"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/Reg_btn_color"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true">
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/mailID"
+                        android:hint="Email Id"
+                        android:textColorHint="@color/hint_accent_color"
+                        android:textColor="@color/text_color"
+                        android:inputType="textPersonName"
+                        android:textSize="18sp"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="25dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="12dp"
+                    android:layout_marginBottom="2dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Gender"
+                        android:textColor="@color/Reg_btn_color"
+                        android:textSize="18sp"
+                        android:id="@+id/Gender_lbl3"
+                        android:layout_alignParentLeft="true"
+                        />
+
+                    <RadioGroup
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/radio_group"
+                        android:layout_below="@id/Gender_lbl3">
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radio_male"
+                            android:text="@string/male"
+                            android:textSize="18sp"
+                            android:textColor="@color/text_color"
+                            android:layout_marginLeft="50dp"
+                            android:onClick="checkButton"/>
+                        <RadioButton
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radio_female"
+                            android:text="@string/Female"
+                            android:textSize="18sp"
+                            android:textColor="@color/text_color"
+                            android:layout_marginLeft="50dp"
+                            android:onClick="checkButton"
+                            />
+
+                        <RadioButton
+                            android:id="@+id/radio_do_not_prefer_to_say"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="50dp"
+                            android:onClick="checkButton"
+                            android:text="@string/not_prefer_to_say"
+                            android:textColor="@color/text_color"
+                            android:textSize="18sp" />
+                    </RadioGroup>
+                </RelativeLayout>
+
+
+
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/Reg_btn_color"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true">
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/Address_Line1"
+                        android:hint="@string/address_line_1"
+                        android:textColorHint="@color/hint_accent_color"
+                        android:textColor="@color/text_color"
+                        android:inputType="text"
+                        android:textSize="18sp"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/Reg_btn_color"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true">
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/Address_Line2"
+                        android:hint="Address Line 2"
+                        android:textColorHint="@color/hint_accent_color"
+                        android:textColor="@color/text_color"
+                        android:inputType="text"
+                        android:textSize="18sp"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/Reg_btn_color"
+                    android:focusableInTouchMode="true"
+                    android:focusable="true">
+
+                    <EditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/Postal_Code"
+                        android:hint="@string/postal_code"
+                        android:textColorHint="@color/hint_accent_color"
+                        android:textColor="@color/text_color"
+                        android:inputType="text"
+                        android:textSize="18sp"
+                        />
+                </com.google.android.material.textfield.TextInputLayout>
+
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/countryName"
+                    android:hint="Country"
+                    android:gravity="left"
+                    android:textColorHint="@color/colorUnselectedIcon"
+                    android:textColor="@color/text_color"
+                    android:inputType="text"
+                    android:textSize="18sp"
+                    android:layout_weight="1.1"/>
+
+                <SearchView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.1"
+                    android:id="@+id/setCountry"
+                    android:background="@color/colorWhite"
+                    android:outlineAmbientShadowColor="@color/hint_accent_color"
+                    android:onClick="openPicker"/>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:weightSum="3"
+                    android:orientation="horizontal">
+
+
+                    <com.hbb20.CountryCodePicker
+                        android:id="@+id/ccp"
+                        android:layout_width="16dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.1"
+                        android:gravity="left"
+                        app:ccp_textSize="16sp"
+                        app:ccp_contentColor="@color/text_color"
+                        app:ccp_autoDetectCountry="true"
+                        app:ccp_showNameCode="true"
+                        />
+
+
+                    <EditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:id="@+id/Phone_number"
+                        android:layout_weight="2"
+                        android:maxLength="10"
+                        android:hint="@string/enter_your_phone_number"
+                        android:textColorHint="@color/Reg_btn_color"
+                        android:inputType="phone"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/progressBarHolder"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:indeterminateTintMode="src_atop"
+                    android:indeterminateTint="@color/Orange"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    android:layout_gravity="center" />
+                <Button
+                    android:id="@+id/regBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/Orange"
+                    android:text="Save"
+                    />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </RelativeLayout>
+</ScrollView>
+
