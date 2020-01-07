@@ -41,6 +41,7 @@ import lu.uni.project.eventmanager.activity.BottomNavigationActivity;
 import lu.uni.project.eventmanager.adapter.EventsAdapter;
 import lu.uni.project.eventmanager.fragment.HomeFragment;
 import lu.uni.project.eventmanager.pojo.Event;
+import lu.uni.project.eventmanager.pojo.RatingNotification;
 import lu.uni.project.eventmanager.util.PreferenceKeys;
 import lu.uni.project.eventmanager.util.SharedPreferencesHelper;
 
@@ -109,6 +110,19 @@ public class RateEventDialog extends Dialog implements
                                 listner.onDismiss(roundedFloat);
                                 break;
                             }
+                            final DatabaseReference ratingNotificationParent= FirebaseDatabase.getInstance().getReference("ratingNotification").child(event.getUserId());
+                            final String ratingNotificationID= ratingNotificationParent.push().getKey();
+                            final DatabaseReference ratingNotification = ratingNotificationParent.child(ratingNotificationID);
+                            if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+                                RatingNotification ratingNotificationPojo= new RatingNotification();
+                                ratingNotificationPojo.setUserID(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                ratingNotificationPojo.setRating(Float.toString(ratingBar.getRating()));
+                                ratingNotificationPojo.setNotificationID(ratingNotificationID);
+                                ratingNotificationPojo.setTimeStamp(Long.toString(System.currentTimeMillis()));
+                                ratingNotificationPojo.setEventID(event.getEventId());
+                                ratingNotificationPojo.setEventName(event.getEventName());
+                                ratingNotification.setValue(ratingNotificationPojo);
+                            }
                         }
                     }
 
@@ -129,6 +143,6 @@ public class RateEventDialog extends Dialog implements
     }
 
     public interface DismisListner{
-        public void onDismiss(float rating);
+        void onDismiss(float rating);
     }
 }

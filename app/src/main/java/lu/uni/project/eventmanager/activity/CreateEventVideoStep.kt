@@ -25,8 +25,6 @@ import java.io.IOException
 
 
 class CreateEventVideoStep : AppCompatActivity() {
-//    internal var sliderView: SliderView?= null
-
     private val REQUEST_CODE=123
     var mp: MediaPlayer? = null
 
@@ -66,29 +64,6 @@ class CreateEventVideoStep : AppCompatActivity() {
                     .show()
         }
     }
-
-    /*override fun loadImage(imageFile: File, ivImage: ImageView) {
-        Glide.with(this).load(imageFile).into(ivImage)
-    }
-
-    override fun onMultiImageSelected(uriList: List<Uri>, tag: String?) {
-        imagesList= uriList
-        GlobalUtil.imagesList= uriList
-        val adapterinner = SliderAdapter(this, uriList)
-
-        imageSlider?.visibility= View.VISIBLE
-        imageSlider?.sliderAdapter = adapterinner
-
-        imageSlider?.setIndicatorAnimation(IndicatorAnimations.SLIDE) //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
-        imageSlider?.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION)
-//        sliderView?.autoCycleDirection = SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH
-        imageSlider?.indicatorSelectedColor = Color.WHITE
-        imageSlider?.indicatorUnselectedColor = Color.GRAY
-//        sliderView?.startAutoCycle()
-
-        imageSlider?.setOnInd*icatorClickListener { position -> imageSlider!!.currentPagePosition = position }
-
-    }*/
     open fun getPath(uri: Uri?): String? {
         val projection = arrayOf(MediaStore.Images.Media.DATA)
         val cursor: Cursor? = managedQuery(uri, projection, null, null, null)
@@ -106,7 +81,6 @@ class CreateEventVideoStep : AppCompatActivity() {
                 try {
                     if (selectedVideoPath == null) {
                         Log.e("","selected video path = null!")
-//                        finish()
                     } else {
                         var uriList= mutableListOf<Uri>()
                         uriList.add(Uri.parse(selectedVideoPath))
@@ -131,41 +105,16 @@ class CreateEventVideoStep : AppCompatActivity() {
                                 videoView.start()
                             }
                         }
-                        /*imageSlider?.visibility= View.VISIBLE
-                        imageSlider?.sliderAdapter = adapterinner
-
-                        imageSlider?.setIndicatorAnimation(IndicatorAnimations.SLIDE) //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
-                        imageSlider?.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION)
-//        sliderView?.autoCycleDirection = SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH
-                        imageSlider?.indicatorSelectedColor = Color.WHITE
-                        imageSlider?.indicatorUnselectedColor = Color.GRAY
-//        sliderView?.startAutoCycle()
-
-                        imageSlider?.setOnIndicatorClickListener { position -> imageSlider!!.currentPagePosition = position }*/
                     }
-                } catch (e: IOException) { //#debug
+                } catch (e: IOException) {
                     e.printStackTrace()
 
                 }
             }
         }
-//        finish()
-
-    }
-    fun pause() { //NOT videoview.pause(); Needn't save Stop position
-        if (mp != null) {
-            mp!!.pause()
-        }
-    }
-
-    fun resume() { //NOT videoview.resume();
-        if (mp != null) {
-            mp!!.start() //Video will begin where it stopped
-        }
     }
     companion object {
         var videoList: List<Uri>?= null
-
         fun changeStatusBarColor(activity: Activity) {
             val window = activity.window
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -178,7 +127,5 @@ class CreateEventVideoStep : AppCompatActivity() {
                 decorView.systemUiVisibility = systemUiVisibilityFlags
             }
         }
-
     }
-
 }

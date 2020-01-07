@@ -81,19 +81,15 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 	private int MAP_BUTTON_REQUEST_CODE= 1;
 	private int EDIT_EVENT_REQUEST_CODE= 1;
 
-	/**
-	 *
-	 * @param context
-	 * @param startCount the initial number of views to show
-	 * @param stepNumber the number of additional views to show with each expansion
-	 */
 	public EventsAdapter(FragmentActivity context,List<Event> values, int startCount, int stepNumber) {
 		super(context, R.layout.row_layout, values);
-		this.context = context;
-		this.values = values;
-		this.startCount = Math.min(startCount, values.size()); //don't try to show more views than we have
-		this.count = this.startCount;
-		this.stepNumber = stepNumber;
+		if(context!=null){
+            this.context = context;
+            this.values = values;
+            this.startCount = Math.min(startCount, values.size()); //don't try to show more views than we have
+            this.count = this.startCount;
+            this.stepNumber = stepNumber;
+        }
 	}
 
 	public List<StorageReference> getEventImageStorageReference(Event event){
@@ -124,7 +120,6 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 	@Override
 	public View getView(final int position, View view, ViewGroup parent) {
         final ViewHolder holder;
-
         if(view == null){
 			view = LayoutInflater.from(context).inflate(R.layout.row_layout, null);
             holder = new ViewHolder();
@@ -260,10 +255,14 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 
                         }
                     });
+                    if(FirebaseAuth.getInstance().getCurrentUser()==null){
+                        holder.menuLayout.setVisibility(View.GONE);
+                    }
                     holder.menuLayout.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             if(user.getUid()!=null&& FirebaseAuth.getInstance().getCurrentUser()!=null){
+                                holder.menuLayout.setVisibility(View.VISIBLE);
                                 final PopupMenu popupMenu = new PopupMenu(context, holder.menuLayout);
                                 if(user.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
                                     popupMenu.getMenu().add("Delete event");
@@ -373,6 +372,8 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                                     }
                                 });
                                 popupMenu.show();
+                            }else{
+                                holder.menuLayout.setVisibility(View.GONE);
                             }
                         }
                     });
@@ -417,7 +418,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                 }
             });
         }else{
-            holder.save.setVisibility(View.INVISIBLE);
+            holder.save.setVisibility(View.GONE);
         }
 
 
@@ -540,10 +541,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         View eventDetailsHolder= view.findViewById(R.id.eventDetails);
         holder.videoView.setVisibility(View.GONE);
 
-//        final VideoView videoView= view.findViewById(R.id.videoView);
         if(holder.eventName.getText().toString().contentEquals(values.get(position).getEventName())){
-            List<StorageReference> stor= getEventVideooStorageReference(values.get(position));
-
             if(values.get(position).getVideosCount()>0){
                 holder.videoView.setVisibility(View.VISIBLE);
                 holder.videoView.setVideoURI(Uri.parse(values.get(position).getVideosDownloadURL()));
@@ -561,9 +559,6 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                 });
             }
         }
-
-//        ViewPager multimediaVP= view.findViewById(R.id.multimediaViewPager);
-//        multimediaVP.setAdapter(new MultimediaAdapter(context.getSupportFragmentManager(),getEventImageStorageReference(values.get(position))));
         SliderView imageSlider= view.findViewById(R.id.imageSlider);
         imageSlider.setSliderAdapter(new SliderAdapter(context, getEventImageStorageReference(values.get(position)), true));
         eventDetailsHolder.setOnClickListener(new View.OnClickListener() {
@@ -617,17 +612,6 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         VideoView videoView;
     }
 
-
-
-
-
-
-
-
-
-
-
-
     public void reloadData(){
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference ref = database.getReference("event");
@@ -648,8 +632,6 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             }
         });
     }
-
-
 
 	/**
 	 * Show more views, or the bottom
@@ -672,13 +654,6 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 		return count == values.size();
 	}
 	
-	/**
-	 * Sets the ListView back to its initial count number
-	 */
-	public void reset(){
-		count = startCount;
-		notifyDataSetChanged();
-	}
 	static class RetrieveProfileImage extends AsyncTask<Object, Void, Bitmap> {
 
 		private Exception exception;
@@ -716,8 +691,6 @@ public class EventsAdapter extends ArrayAdapter<Event>{
 		}
 
 		protected void onPostExecute(Bitmap feed) {
-			// TODO: check this.exception
-			// TODO: do something with the feed
 		}
 	}
 

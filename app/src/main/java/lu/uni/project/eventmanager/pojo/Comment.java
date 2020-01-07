@@ -7,8 +7,6 @@ public class Comment {
     public String commentID;
     public String eventID;
 
-
-
     public String getCommentID() {
         return commentID;
     }

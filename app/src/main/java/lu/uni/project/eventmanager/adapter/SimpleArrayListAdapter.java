@@ -28,20 +28,13 @@ public class SimpleArrayListAdapter extends ArrayAdapter<String> implements Filt
     private ArrayList<String> mBackupStrings;
     private ArrayList<String> mStrings;
     private StringFilter mStringFilter = new StringFilter();
-    private String defaultSelected;
     public SimpleArrayListAdapter(Context context, ArrayList<String> strings) {
         super(context, R.layout.view_list_item);
         mContext = context;
         mStrings = strings;
         mBackupStrings = strings;
     }
-    public SimpleArrayListAdapter(Context context, ArrayList<String> strings, String defaultSelected) {
-        super(context, R.layout.view_list_item);
-        mContext = context;
-        mStrings = strings;
-        mBackupStrings = strings;
-        this.defaultSelected= defaultSelected;
-    }
+
     @Override
     public int getCount() {
         return mStrings == null ? 0 : mStrings.size() + 1;
@@ -155,15 +148,6 @@ public class SimpleArrayListAdapter extends ArrayAdapter<String> implements Filt
             mStrings = (ArrayList) results.values;
             notifyDataSetChanged();
         }
-    }
-
-    private class ItemView {
-        public ImageView mImageView;
-        public TextView mTextView;
-    }
-
-    public enum ItemViewType {
-        ITEM, NO_SELECTION_ITEM;
     }
 
 }

@@ -3,46 +3,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_weight="500"
-    android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragment.RatingFragment">
+    android:weightSum="13"
+    android:orientation="vertical"
+    tools:context=".fragment.HomeFragment">
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
-        android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0">
+        android:layout_height="0dp"
+        android:layout_weight="1">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:weightSum="10"
             android:gravity="center"
-            android:background="@color/colorButtonBlack"
-            android:layout_gravity="center"
+            android:background="@color/colorWhite"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_weight="7"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Rating"
-                android:textStyle="bold"
+                android:text="Saved events"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:padding="16dp"
-                android:textColor="@color/colorWhite"
+                android:textStyle="bold"
+                android:layout_marginLeft="16dp"
+                android:textColor="@color/colorBlack"
                 android:textSize="20dp"/>
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
-    <ListView
-        android:id="@+id/ratingList"
-        android:layout_weight="450"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_marginBottom="16dp"
-        android:divider="@color/Orange"
-        android:layout_height="wrap_content">
-    </ListView>
+        android:layout_height="0dp"
+        android:layout_weight="12"
+        android:orientation="vertical">
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+
 </LinearLayout>

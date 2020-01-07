@@ -28,8 +28,6 @@ import java.io.File
 
 
 class CreateEventStep3 : AppCompatActivity(),  BSImagePicker.OnSingleImageSelectedListener, BSImagePicker.OnMultiImageSelectedListener, BSImagePicker.ImageLoaderDelegate {
-//    internal var sliderView: SliderView?= null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_event_step3)
@@ -80,19 +78,13 @@ class CreateEventStep3 : AppCompatActivity(),  BSImagePicker.OnSingleImageSelect
         imagesList= uriList
         GlobalUtil.imagesList= uriList
         val adapterinner = SliderAdapter(this, uriList)
-
         imageSlider?.visibility= View.VISIBLE
         imageSlider?.sliderAdapter = adapterinner
-
         imageSlider?.setIndicatorAnimation(IndicatorAnimations.SLIDE) //set indicator animation by using SliderLayout.IndicatorAnimations. :WORM or THIN_WORM or COLOR or DROP or FILL or NONE or SCALE or SCALE_DOWN or SLIDE and SWAP!!
         imageSlider?.setSliderTransformAnimation(SliderAnimations.CUBEINROTATIONTRANSFORMATION)
-//        sliderView?.autoCycleDirection = SliderView.AUTO_CYCLE_DIRECTION_BACK_AND_FORTH
         imageSlider?.indicatorSelectedColor = Color.WHITE
         imageSlider?.indicatorUnselectedColor = Color.GRAY
-//        sliderView?.startAutoCycle()
-
         imageSlider?.setOnIndicatorClickListener { position -> imageSlider!!.currentPagePosition = position }
-
     }
 
     override fun onSingleImageSelected(uri: Uri, tag: String) {
@@ -100,7 +92,6 @@ class CreateEventStep3 : AppCompatActivity(),  BSImagePicker.OnSingleImageSelect
     }
     companion object {
         var imagesList: List<Uri>?= null
-
         fun changeStatusBarColor(activity: Activity) {
             val window = activity.window
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)

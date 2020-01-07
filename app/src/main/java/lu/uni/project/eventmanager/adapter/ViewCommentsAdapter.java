@@ -18,6 +18,8 @@ import androidx.annotation.Nullable;
 
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,13 +46,6 @@ public class ViewCommentsAdapter extends ArrayAdapter<Comment>{
 		this.values = values;
 	}
 
-	public static void getCommentsForEventASynchronously(ValueEventListener listner, Event event)  {
-		final FirebaseDatabase database = FirebaseDatabase.getInstance();
-		DatabaseReference ref = database.getReference("comment").child(event.getEventId());
-		ref.addValueEventListener(listner);
-	}
-
-
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		final ViewHolder holder;
@@ -75,10 +70,13 @@ public class ViewCommentsAdapter extends ArrayAdapter<Comment>{
 		holder.commenHolder.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(holder.commentOptions.getVisibility()== View.GONE){
-					holder.commentOptions.setVisibility(View.VISIBLE);
-				}else{
-					holder.commentOptions.setVisibility(View.GONE);
+				FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+				if(currentUser!=null && currentUser.getUid().contentEquals(values.get(position).getUserID())){
+					if(holder.commentOptions.getVisibility()== View.GONE){
+						holder.commentOptions.setVisibility(View.VISIBLE);
+					}else{
+						holder.commentOptions.setVisibility(View.GONE);
+					}
 				}
 			}
 		});
@@ -146,8 +144,6 @@ public class ViewCommentsAdapter extends ArrayAdapter<Comment>{
 		return convertView;
 	}
 
-
-
 	@Override
 	public Comment getItem(int position){
 		return values.get(position);
@@ -158,9 +154,6 @@ public class ViewCommentsAdapter extends ArrayAdapter<Comment>{
 	public int getCount() {
 		return values.size();
 	}
-
-
-
 
 	class ViewHolder {
 		ImageView profileImage;

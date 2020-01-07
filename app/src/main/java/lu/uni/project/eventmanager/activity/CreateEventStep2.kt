@@ -29,11 +29,9 @@ class CreateEventStep2 : AppCompatActivity() {
     private val mStrings = ArrayList<String>()
     private val mOnItemSelectedListener = object : OnItemSelectedListener {
         override fun onItemSelected(view: View, position: Int, id: Long) {
-//            Toast.makeText(this@MainActivity, "Item on position " + position + " : " + mSimpleListAdapter.getItem(position) + " Selected", Toast.LENGTH_SHORT).show()
         }
 
         override fun onNothingSelected() {
-//            Toast.makeText(this@MainActivity, "Nothing Selected", Toast.LENGTH_SHORT).show()
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,7 +113,6 @@ class CreateEventStep2 : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
     companion object {
-
         fun changeStatusBarColor(activity: Activity) {
             val window = activity.window
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="4dp"
+    android:paddingRight="4dp"
+    android:paddingLeft="8dp"
+    android:visibility="gone"
+    android:id="@+id/distanceHolder"
+    android:orientation="vertical"
+    app:layout_collapseMode="parallax"
+    app:layout_collapseParallaxMultiplier="0.5">
+
+    <SeekBar
+        android:id="@+id/distanceSeeker"
+        android:paddingTop="26dp"
+        android:layout_marginTop="36dp"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:paddingBottom="26dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0 KM"
+        android:id="@+id/seekBarDistance"
+        android:padding="16dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="16dp"
+        android:outlineSpotShadowColor="@color/colorBlack"
+        android:outlineAmbientShadowColor="@color/colorBlack"
+        android:textColor="@color/colorBlack"/>
+</LinearLayout>

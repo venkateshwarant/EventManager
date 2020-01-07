@@ -6,7 +6,6 @@ public class Event implements Serializable {
     public String eventName="";
     public String eventDescription="";
     public String eventCategory="";
-//    public List<Uri> images= Collections.emptyList();
     public String images="";
     public String startDate="";
     public String endDate="";
@@ -27,7 +26,6 @@ public class Event implements Serializable {
         this.eventName = eventName;
         this.eventDescription = eventDescription;
         this.eventCategory = eventCategory;
-//        this.images = images;
         this.startDate = startDate;
         this.endDate = endDate;
         this.startTime = startTime;

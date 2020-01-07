@@ -7,7 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
@@ -28,21 +30,22 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import lu.uni.project.eventmanager.R;
+import lu.uni.project.eventmanager.Service.GPSTracker;
 import lu.uni.project.eventmanager.adapter.EventsAdapter;
 import lu.uni.project.eventmanager.bottomsheet.FillterBottomSheetFragment;
 import lu.uni.project.eventmanager.pojo.Event;
 
 public class HomeFragment extends Fragment implements AbsListView.OnScrollListener {
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
@@ -51,27 +54,7 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
     private EventsAdapter adapter;
     private Handler mHandler;
     SwipeRefreshLayout mySwipeRefreshLayout=null;
-    public HomeFragment HomeFragment() {
-        return new HomeFragment();
-    }
 
-    public static HomeFragment newInstance(String param1, String param2) {
-        HomeFragment fragment = new HomeFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -89,21 +72,101 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
                 }
         );
         mHandler = new Handler();
-
-        //inflate the progress bar from the footer, it is wrapped in a FrameLayout since
-        //ListViews don't shrink in height when a child is set to visibility gone, but
-        //a FrameLayout with height of wrap_content will
         View footer = getLayoutInflater().inflate(R.layout.progress_bar_footer, null);
-        progressBar = (ProgressBar) footer.findViewById(R.id.progressBar);
+        progressBar = footer.findViewById(R.id.progressBar);
 
-        listView = (ListView) root.findViewById(R.id.listView);
+        listView = root.findViewById(R.id.listView);
         listView.addFooterView(footer);
         mySwipeRefreshLayout.setRefreshing(true);
 
         root.findViewById(R.id.filter).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FillterBottomSheetFragment btmSheet= new FillterBottomSheetFragment();
+                FillterBottomSheetFragment btmSheet= new FillterBottomSheetFragment(new FillterBottomSheetFragment.OnFilterSelectListener() {
+                    @Override
+                    public void onSelectDistanceRange(final int range) {
+                        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        final DatabaseReference ref = database.getReference("event");
+                        ref.addValueEventListener(new ValueEventListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.M)
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                List<Event> outputList= new ArrayList();
+                                List<Event> newList= new ArrayList();
+                                Context context= getContext();
+                                if(context!=null){
+                                    GPSTracker gpsTracker = new GPSTracker(context);
+                                    gpsTracker.getLocation();
+                                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                                        Event event = postSnapshot.getValue(Event.class);
+                                        outputList.add(event);
+                                        if(distance(Double.parseDouble(event.getLocation().getLatitude()),Double.parseDouble(event.getLocation().getLongitude()), gpsTracker.getLatitude(), gpsTracker.getLongitude())<=range){
+                                            newList.add(event);
+                                        }
+
+                                    }
+                                    FragmentActivity act = getActivity();
+                                    if(act!=null){
+                                        adapter = new EventsAdapter(act,newList , 20, 10);
+                                        listView.setAdapter(adapter);
+                                        progressBar.setVisibility((20 < outputList.size())? View.VISIBLE : View.GONE);
+                                        listView.setOnScrollListener(HomeFragment.this); //listen for a scroll movement to the bottom
+                                        mySwipeRefreshLayout.setRefreshing(false);
+                                    }
+                                }
+                                ref.removeEventListener(this);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                mySwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+
+                    @NotNull
+                    @Override
+                    public void onSelectDateRange(@NotNull final Date from, @NotNull final Date to) {
+                        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                        final DatabaseReference ref = database.getReference("event");
+                        ref.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                List<Event> outputList= new ArrayList();
+                                List<Event> newList= new ArrayList();
+                                for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
+                                    Event event = postSnapshot.getValue(Event.class);
+                                    outputList.add(event);
+                                    SimpleDateFormat formatter=new SimpleDateFormat("yyyy-MM-dd");
+                                    try {
+                                        Date startDate= formatter.parse(event.getStartDate());
+                                        Date endDate= formatter.parse(event.getEndDate());
+                                        if( endDate.before(to) &&endDate.after(from) || startDate.before(to)&&startDate.after(from)  || endDate.before(to)&&startDate.after(from)){
+                                            newList.add(event);
+                                        }
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+                                FragmentActivity act = getActivity();
+                                if(act!=null){
+                                adapter = new EventsAdapter(act,newList , 20, 10);
+                                listView.setAdapter(adapter);
+                                progressBar.setVisibility((20 < outputList.size())? View.VISIBLE : View.GONE);
+                                listView.setOnScrollListener(HomeFragment.this); //listen for a scroll movement to the bottom
+                                mySwipeRefreshLayout.setRefreshing(false);
+                                ref.removeEventListener(this);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                mySwipeRefreshLayout.setRefreshing(false);
+                            }
+                        });
+                    }
+                });
                 btmSheet.show(getActivity().getSupportFragmentManager(),"");
             }
         });
@@ -118,12 +181,14 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
                     Event event = postSnapshot.getValue(Event.class);
                     outputList.add(event);
                 }
-                adapter = new EventsAdapter(getActivity(),outputList , 20, 10);
+                FragmentActivity act = getActivity();
+                if(act!=null){
+                adapter = new EventsAdapter(act,outputList , 20, 10);
                 listView.setAdapter(adapter);
                 progressBar.setVisibility((20 < outputList.size())? View.VISIBLE : View.GONE);
                 listView.setOnScrollListener(HomeFragment.this); //listen for a scroll movement to the bottom
                 mySwipeRefreshLayout.setRefreshing(false);
-                ref.removeEventListener(this);
+                ref.removeEventListener(this);}
             }
 
             @Override
@@ -133,12 +198,6 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
         });
         changeStatusBarColor(getActivity());
         return root;
-    }
-
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -175,21 +234,12 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
     }
 
     private boolean hasCallback;
-    private Runnable showMore = new Runnable(){
-        public void run(){
-            boolean noMoreToShow = adapter.showMore(); //show more views and find out if
-            progressBar.setVisibility(noMoreToShow? View.GONE : View.VISIBLE);
-            hasCallback = false;
-        }
-    };
     private void loadItems(final View view) {
         if(view!=null){
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     mHandler = new Handler();
-//                    View footer = getLayoutInflater().inflate(R.layout.progress_bar_footer, null);
-//                    listView.addFooterView(footer);
                     mySwipeRefreshLayout.setRefreshing(true);
 
                     final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -202,12 +252,14 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
                                 Event event = postSnapshot.getValue(Event.class);
                                 outputList.add(event);
                             }
-                            adapter = new EventsAdapter(getActivity(),outputList , 20, 10);
+                            FragmentActivity act = getActivity();
+                            if(act!=null){
+                            adapter = new EventsAdapter(act,outputList , 20, 10);
                             listView.setAdapter(adapter);
                             progressBar.setVisibility((20 < outputList.size())? View.VISIBLE : View.GONE);
                             listView.setOnScrollListener(HomeFragment.this); //listen for a scroll movement to the bottom
                             mySwipeRefreshLayout.setRefreshing(false);
-                            ref.removeEventListener(this);
+                            ref.removeEventListener(this);}
                         }
 
                         @Override
@@ -230,5 +282,25 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
             systemUiVisibilityFlags = systemUiVisibilityFlags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             decorView.setSystemUiVisibility(systemUiVisibilityFlags);
         }
+    }
+    private double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1))
+                * Math.sin(deg2rad(lat2))
+                + Math.cos(deg2rad(lat1))
+                * Math.cos(deg2rad(lat2))
+                * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI / 180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180.0 / Math.PI);
     }
 }

@@ -49,7 +49,6 @@ class CreateEventStep5 : AppCompatActivity() {
         pickLocationButton.setOnClickListener{
             val locationPickerIntent = LocationPickerActivity.Builder()
                     .withGeolocApiKey("AIzaSyBr5l_bqBZWFO9W2Ys3HrNRwF0_9628KYo")
-//                    .shouldReturnOkOnBackPressed()
                     .withZipCodeHidden()
                     .withGooglePlacesEnabled()
                     .withGoogleTimeZoneEnabled()
@@ -101,21 +100,12 @@ class CreateEventStep5 : AppCompatActivity() {
             var vid= videoRef?.child("0")
             var uploadTask = vid?.putStream(stream!!)
             uploadTask?.addOnFailureListener {
-                // Handle unsuccessful uploads
             }?.addOnSuccessListener {
                 vid?.downloadUrl?.addOnCompleteListener{
                     eventObj?.setVideosDownloadURL(it.result.toString())
                     UpdateTask().execute(eventObj as Object, this as Object)
                 }
             }
-
-
-
-
-
-//            var intent= Intent(this, CreateEventStep5::class.java)
-//            startActivity(intent)
-//            this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
         }
         back.setOnClickListener{
             finish()
@@ -156,38 +146,20 @@ class CreateEventStep5 : AppCompatActivity() {
                 val postalcode = data.getStringExtra(ZIPCODE)
                 zipc= postalcode
                 Log.d("POSTALCODE****", postalcode?.toString())
-//                val bundle = data.getBundleExtra(TRANSITION_BUNDLE)
-//                Log.d("BUNDLE TEXT****", bundle?.getString("test"))
                 val fullAddress = data.getParcelableExtra<Address>(ADDRESS)
                 if (fullAddress != null) {
                     Log.d("FULL ADDRESS****", fullAddress.toString())
                 }
-//                val timeZoneId = data.getStringExtra(TIME_ZONE_ID)
-//                Log.d("TIME ZONE ID****", timeZoneId)
-//                val timeZoneDisplayName = data.getStringExtra(TIME_ZONE_DISPLAY_NAME)
-//                Log.d("TIME ZONE NAME****", timeZoneDisplayName)
                 pickLocationButton.visibility= View.GONE
                 addressLayout.visibility= View.VISIBLE
                 addressText.text= address?.toString()
                 addressLayout.setOnClickListener{
                     val locationPickerIntent = LocationPickerActivity.Builder()
-//                    .withLocation(41.4036299, 2.1743558)
                             .withGeolocApiKey("AIzaSyBr5l_bqBZWFO9W2Ys3HrNRwF0_9628KYo")
-//                    .withSearchZone("es_ES")
-//                    .withSearchZone(SearchZoneRect(LatLng(26.525467, -18.910366), LatLng(43.906271, 5.394197)))
-//                    .withDefaultLocaleSearchZone()
                             .shouldReturnOkOnBackPressed()
-//                    .withStreetHidden()
-//                    .withCityHidden()
                             .withZipCodeHidden()
-//                    .withSatelliteViewHidden()
-//                    .withMapStyle(R.style.Theme_AppCompat_Map)
-//                    .withMapStyle(R.raw.map_style_retro)
-
                             .withGooglePlacesEnabled()
                             .withGoogleTimeZoneEnabled()
-//                    .withVoiceSearchHidden()
-//                    .withUnnamedRoadHidden()
                             .build(applicationContext)
 
                     startActivityForResult(locationPickerIntent, MAP_BUTTON_REQUEST_CODE)
@@ -236,10 +208,6 @@ class CreateEventStep5 : AppCompatActivity() {
                 var db= FirebaseDatabase.getInstance().getReference("event")
                 val auth = FirebaseAuth.getInstance()
                 val user = auth.currentUser
-                var uid = ""
-                if (user != null) {
-                    uid = user.uid
-                }
                 var event=params[0] as Event
                 var activity=params[1] as Activity
 
@@ -254,15 +222,9 @@ class CreateEventStep5 : AppCompatActivity() {
                     var img= imagesRef?.child("$i.jpg")
                     var uploadTask = img?.putStream(stream)
                     uploadTask?.addOnFailureListener {
-                        // Handle unsuccessful uploads
                     }?.addOnSuccessListener {
-                        // taskSnapshot.metadata contains file metadata such as size, content-type, etc.
-                        // ...
                     }
                 }
-
-
-
                 var intent= Intent(this@CreateEventStep5, BottomNavigationActivity::class.java)
                 intent.putExtra("event_created","true")
                 if(activity?.intent?.extras?.get(BundleKeys.editEventKey)=="true"){
@@ -281,7 +243,6 @@ class CreateEventStep5 : AppCompatActivity() {
 
         override fun onPreExecute() {
             super.onPreExecute()
-//            button.setEnabled(false)
             inAnimation = AlphaAnimation(0f, 1f)
             inAnimation?.duration = 200
             progressBarHolder?.animation = inAnimation
@@ -294,7 +255,6 @@ class CreateEventStep5 : AppCompatActivity() {
             outAnimation?.duration = 200
             progressBarHolder?.animation = outAnimation
             progressBarHolder?.visibility = View.GONE
-//            button.setEnabled(true)
         }
 
     }

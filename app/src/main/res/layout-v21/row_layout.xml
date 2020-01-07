@@ -18,6 +18,7 @@
             android:orientation="horizontal"
             android:weightSum="40"
             android:layout_gravity="center"
+            android:paddingRight="16dp"
             android:gravity="center"
             >
             <ImageView
@@ -72,7 +73,6 @@
                     android:layout_width="26dp"
                     android:layout_height="26dp"
                     android:padding="6dp"
-                    android:layout_marginRight="16dp"
                     android:background="@drawable/shape_round"
                     android:layout_gravity="center_horizontal"
                     app:srcCompat="@drawable/ic_more"/>
@@ -115,137 +115,141 @@
                     app:sliderScrollTimeInSec="660" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:weightSum="5"
+            android:layout_gravity="center"
             android:background="@color/colorBlack"
-            android:orientation="horizontal">
+            android:gravity="center"
+            android:paddingTop="10dp"
+            android:orientation="horizontal"
+            android:weightSum="5">
+
             <LinearLayout
-                android:layout_marginTop="16dp"
                 android:id="@+id/rate"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
-                <ImageView
+
+                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/starImage"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
                     android:layout_gravity="center_horizontal"
-                    app:srcCompat="@drawable/ic_star"/>
+                    app:srcCompat="@drawable/ic_star" />
+
                 <TextView
                     android:id="@+id/rateCount"
-                    android:text=""
-                    android:textSize="10dp"
-                    android:textColor="@color/colorWhite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:text=""
+                    android:textColor="@color/colorWhite"
+                    android:textSize="10dp" />
             </LinearLayout>
+
             <LinearLayout
-                android:layout_marginTop="16dp"
                 android:id="@+id/views"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
-                <ImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
                     android:layout_gravity="center_horizontal"
-                    app:srcCompat="@drawable/ic_view"/>
+                    app:srcCompat="@drawable/ic_view" />
+
                 <TextView
                     android:id="@+id/viewCount"
-                    android:text="3K"
-                    android:textSize="10dp"
-                    android:textColor="@color/colorWhite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:text="3K"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="10dp" />
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/participants"
                 android:layout_width="0dp"
-                android:layout_marginTop="16dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
+                android:layout_weight="1"
+                android:gravity="center"
                 android:orientation="vertical">
-                <ImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
                     android:layout_gravity="center_horizontal"
-                    app:srcCompat="@drawable/ic_participation"/>
+                    app:srcCompat="@drawable/ic_participation" />
+
                 <TextView
                     android:id="@+id/participantsCount"
-                    android:text="0"
-                    android:textSize="10dp"
-                    android:textColor="@color/colorWhite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:text="0"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="10dp" />
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/direction"
                 android:layout_width="0dp"
-                android:layout_marginTop="16dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
-                <ImageView
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
                     android:layout_gravity="center_horizontal"
-                    app:srcCompat="@drawable/ic_right_arrow"/>
+                    app:srcCompat="@drawable/ic_right_arrow" />
+
                 <TextView
-                    android:text="Direction"
-                    android:textSize="10dp"
-                    android:textColor="@color/colorWhite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:text="Direction"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="10dp" />
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/save"
                 android:layout_width="0dp"
-                android:layout_marginTop="16dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
                 android:layout_marginLeft="6dp"
                 android:layout_marginRight="6dp"
+                android:layout_weight="1"
                 android:gravity="center"
                 android:orientation="vertical">
-                <ImageView
+
+                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/saveImg"
-                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
                     android:layout_gravity="center_horizontal"
-                    app:srcCompat="@drawable/ic_bookmark"/>
+                    app:srcCompat="@drawable/ic_bookmark" />
+
                 <TextView
                     android:id="@+id/saveText"
-                    android:text="Save"
-                    android:textSize="10dp"
-                    android:textColor="@color/colorWhite"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    />
+                    android:text="Save"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="10dp" />
             </LinearLayout>
 
         </LinearLayout>

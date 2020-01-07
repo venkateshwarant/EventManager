@@ -19,7 +19,6 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -41,10 +40,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-
 import lu.uni.project.eventmanager.R;
-import lu.uni.project.eventmanager.adapter.EventsAdapter;
 import lu.uni.project.eventmanager.pojo.User;
 import lu.uni.project.eventmanager.util.PreferenceKeys;
 import lu.uni.project.eventmanager.util.SharedPreferencesHelper;

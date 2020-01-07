@@ -19,7 +19,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import lu.uni.project.eventmanager.R;
-import lu.uni.project.eventmanager.fragment.HeartFragment;
+import lu.uni.project.eventmanager.fragment.RatingFragment;
 import lu.uni.project.eventmanager.fragment.HomeFragment;
 import lu.uni.project.eventmanager.fragment.ImageFragment;
 import lu.uni.project.eventmanager.fragment.SearchFragment;
@@ -31,7 +31,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements
         View.OnClickListener,
         HomeFragment.OnFragmentInteractionListener,
         SearchFragment.OnFragmentInteractionListener,
-        HeartFragment.OnFragmentInteractionListener,
+        RatingFragment.OnFragmentInteractionListener,
         UserFragment.OnFragmentInteractionListener,
         ImageFragment.OnFragmentInteractionListener,
         VideoFragment.OnFragmentInteractionListener {
@@ -91,7 +91,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements
             ((ImageView) findViewById(R.id.ic_star)).setImageDrawable(getDrawable(R.drawable.ic_star_black));
             ((ImageView) findViewById(R.id.ic_user)).setImageDrawable(getDrawable(R.drawable.ic_user_unselected));
         }else if(v.getId() == R.id.star_btm_ic){
-            HeartFragment heartFrag= new HeartFragment();
+            RatingFragment heartFrag= new RatingFragment();
             fragmentTransaction.replace(R.id.bottomSheetFragmentHolder, heartFrag);
             ((ImageView) findViewById(R.id.ic_home)).setImageDrawable(getDrawable(R.drawable.ic_home_unselected));
             ((ImageView) findViewById(R.id.ic_search)).setImageDrawable(getDrawable(R.drawable.ic_search_unselected));
@@ -116,9 +116,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
+    public void onFragmentInteraction(Uri uri) { }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

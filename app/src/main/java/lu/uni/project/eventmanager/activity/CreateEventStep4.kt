@@ -34,11 +34,9 @@ class CreateEventStep4 : AppCompatActivity() {
     private val mStrings = ArrayList<String>()
     private val mOnItemSelectedListener = object : OnItemSelectedListener {
         override fun onItemSelected(view: View, position: Int, id: Long) {
-//            Toast.makeText(this@MainActivity, "Item on position " + position + " : " + mSimpleListAdapter.getItem(position) + " Selected", Toast.LENGTH_SHORT).show()
         }
 
         override fun onNothingSelected() {
-//            Toast.makeText(this@MainActivity, "Nothing Selected", Toast.LENGTH_SHORT).show()
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -22,19 +22,84 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/colorWhite"
                 android:textSize="18dp"
+                android:id="@+id/filterTitle"
                 android:textStyle="bold"
                 android:layout_weight="8"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="Filters"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/filterSelect"
+                android:visibility="gone"
+                android:padding="8dp">
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_check_mark"/>
+            </LinearLayout>
         </LinearLayout>
-        <ListView
-            android:id="@+id/filterList"
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/filterListContent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scrollbars="vertical">
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="20"
+                android:id="@+id/dateRangeFilter"
+                android:padding="16dp"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="18dp"
+                    android:layout_weight="19"
+                    android:layout_gravity="center"
+                    android:gravity="left"
 
-        </ListView>
+                    android:text="Date range"/>
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_arrow_point_to_right"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:id="@+id/distanceFilter"
+                android:weightSum="20">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="18dp"
+                    android:layout_weight="19"
+                    android:layout_gravity="center"
+                    android:gravity="left"
+                    android:text="Distance arround"/>
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_arrow_point_to_right"/>
+            </LinearLayout>
+        </LinearLayout>
+        <include layout="@layout/layout_date_range_filter"/>
+        <include layout="@layout/layout_filter_distance"/>
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
