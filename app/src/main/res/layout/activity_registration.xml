@@ -216,7 +216,7 @@
                         android:hint="@string/address_line_1"
                         android:textColorHint="@color/hint_accent_color"
                         android:textColor="@color/text_color"
-                        android:inputType="textPassword"
+                        android:inputType="text"
                         android:textSize="18sp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -235,7 +235,7 @@
                         android:hint="Address Line 2"
                         android:textColorHint="@color/hint_accent_color"
                         android:textColor="@color/text_color"
-                        android:inputType="textPassword"
+                        android:inputType="text"
                         android:textSize="18sp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -254,7 +254,7 @@
                         android:hint="@string/postal_code"
                         android:textColorHint="@color/hint_accent_color"
                         android:textColor="@color/text_color"
-                        android:inputType="textPassword"
+                        android:inputType="text"
                         android:textSize="18sp"
                         />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -272,15 +272,14 @@
                     android:textSize="18sp"
                     android:layout_weight="1.1"/>
 
-                <SearchView
+                <!--<SearchView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1.1"
                     android:id="@+id/setCountry"
                     android:background="@color/colorWhite"
-                    android:outlineAmbientShadowColor="@color/hint_accent_color"
-                    android:onClick="openPicker"/>
-
+                    android:outlineAmbientShadowColor="@color/hint_accent_color" />
+-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -330,6 +329,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="10dp"
+                    android:layout_marginBottom="26dp"
                     android:background="@color/Orange"
                     android:text="Register"
                     />

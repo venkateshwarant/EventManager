@@ -95,7 +95,15 @@ private static final int RESULT_LOAD_IMAGE = 1;
         countryName =  findViewById(R.id.countryName);
         phoneNumber =  findViewById(R.id.phone_number);
         imageToUpload.setOnClickListener(this);
-
+        countryName.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(!picker.isAdded()){
+                    picker.show(getSupportFragmentManager(), "COUNTRY_PICKER");
+                }
+                return false;
+            }
+        });
         radioGroup=findViewById(R.id.radio_group);
         inAnimation = new AlphaAnimation(0f, 1f);
         inAnimation.setDuration(200);

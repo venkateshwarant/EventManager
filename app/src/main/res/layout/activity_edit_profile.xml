@@ -232,15 +232,6 @@
                     android:textSize="18sp"
                     android:layout_weight="1.1"/>
 
-                <SearchView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1.1"
-                    android:id="@+id/setCountry"
-                    android:background="@color/colorWhite"
-                    android:outlineAmbientShadowColor="@color/hint_accent_color"
-                    android:onClick="openPicker"/>
-
 
                 <LinearLayout
                     android:layout_width="match_parent"

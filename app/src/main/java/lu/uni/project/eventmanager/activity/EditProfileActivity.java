@@ -99,6 +99,15 @@ private static final int RESULT_LOAD_IMAGE = 1;
         init();
         setupUI(findViewById(R.id.registerParent));
         changeStatusBarColor(EditProfileActivity.this);
+        countryName.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(!picker.isAdded()){
+                    picker.show(getSupportFragmentManager(), "COUNTRY_PICKER");
+                }
+                return false;
+            }
+        });
         if(FirebaseAuth.getInstance().getCurrentUser()!=null){
             final FirebaseDatabase database = FirebaseDatabase.getInstance();
             final DatabaseReference ref = database.getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
@@ -115,6 +124,7 @@ private static final int RESULT_LOAD_IMAGE = 1;
                     String[] address = user.getAddress().split("\n");
                     addressLine1.setText(address[0]!=null?address[0]:"");
                     addressLine2.setText(address[1]!=null?address[1]:"");
+                    countryName.setText(user.getCountry());
                     postalCode.setText(address[2]!=null?address[2].replace("Postal code:",""):"");
                     if(user.getProfileImgURL()!=null&& !user.getProfileImgURL().isEmpty()){
                         imageToUpload.setImageURI(Uri.parse(user.getProfileImgURL()));
@@ -152,6 +162,7 @@ private static final int RESULT_LOAD_IMAGE = 1;
                             user.setPhoneNumber(phoneNumber.getText().toString());
                             String address=addressLine1.getText()+"\n"+addressLine2.getText()+"\n"+"Postal code:"+postalCode.getText();
                             user.setAddress(address);
+                            user.setCountry(countryName.getText().toString());
                             user.setProfileImgURL(user.getProfileImgURL());
                             ref.setValue(user);
                             startActivity(new Intent(EditProfileActivity.this, MainActivity.class));
@@ -181,8 +192,8 @@ private static final int RESULT_LOAD_IMAGE = 1;
                                                     user.setPhoneNumber(phoneNumber.getText().toString());
                                                     String address=addressLine1.getText()+"\n"+addressLine2.getText()+"\n"+"Postal code:"+postalCode;
                                                     user.setAddress(address);
-                                                    user.setProfileImgURL(user.getProfileImgURL());
                                                     user.setProfileImgURL(imgDownloadURL[0]);
+                                                    user.setCountry(countryName.getText().toString());
                                                     db.setValue(user);
                                                     Toast.makeText(EditProfileActivity.this, "Edited succesfully!", Toast.LENGTH_SHORT).show();
                                                     progressBarHolder.setAnimation(outAnimation);
