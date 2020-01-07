@@ -1,4 +1,4 @@
-package lu.uni.project.eventmanager;
+package lu.uni.project.eventManager;
 
 import static org.junit.Assert.*;
 
