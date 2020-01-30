@@ -105,25 +105,6 @@ public class LoginActivity extends AppCompatActivity {
                         .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                final DatabaseReference userRef = database.getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                                userRef.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        User user= dataSnapshot.getValue(User.class);
-                                        if(user!=null){
-                                            SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profilePhotoURI, user.getProfileImgURL()!=null?user.getProfileImgURL():"");
-                                            SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileFirstName,user.getFirstName()!=null?user.getFirstName():"");
-                                            SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileLastName, user.getLastName()!=null?user.getLastName():"");
-                                            SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileDisplayName, user.getDisplayName()!=null?user.getDisplayName():"");
-                                        }
-                                        userRef.removeEventListener(this);
-                                    }
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
                                 if (!task.isSuccessful()) {
                                     if (password.length() < 6) {
                                         Toast.makeText(getApplicationContext(), "Password is less than 6 characters!", Toast.LENGTH_SHORT).show();
@@ -131,6 +112,25 @@ public class LoginActivity extends AppCompatActivity {
                                         Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                     }
                                 } else {
+                                    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                    final DatabaseReference userRef = database.getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                                    userRef.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            User user= dataSnapshot.getValue(User.class);
+                                            if(user!=null){
+                                                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profilePhotoURI, user.getProfileImgURL()!=null?user.getProfileImgURL():"");
+                                                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileFirstName,user.getFirstName()!=null?user.getFirstName():"");
+                                                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileLastName, user.getLastName()!=null?user.getLastName():"");
+                                                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profileDisplayName, user.getDisplayName()!=null?user.getDisplayName():"");
+                                            }
+                                            userRef.removeEventListener(this);
+                                        }
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
                                     Intent intent = new Intent(LoginActivity.this, BottomNavigationActivity.class);
                                     startActivity(intent);
                                     finish();

@@ -11,11 +11,16 @@ import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.AlphaAnimation
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toFile
 import com.google.firebase.auth.FirebaseAuth
@@ -56,53 +61,59 @@ class CreateEventStep5 : AppCompatActivity() {
 
             startActivityForResult(locationPickerIntent, MAP_BUTTON_REQUEST_CODE)
         }
+        activity=this@CreateEventStep5
+        setupUI(createEvent5Container)
         next.setOnClickListener{
-            var event= intent.extras
-            event?.putString(BundleKeys.addressKey,  addr)
-            event?.putString(BundleKeys.lattitudeKey, lat)
-            event?.putString(BundleKeys.longitudeKey, lon)
-            event?.putString(BundleKeys.zipcodeKey, zipc)
-
-            eventObj= Event()
-            eventObj?.eventName=event?.getString(BundleKeys.eventNameKey)
-            eventObj?.eventDescription=event?.getString(BundleKeys.eventDescriptionKey)
-            eventObj?.eventCategory=event?.getString(BundleKeys.eventCategoryKey)
-            eventObj?.startTime=event?.getString(BundleKeys.startTimeKey)
-            eventObj?.startTime=event?.getString(BundleKeys.startTimeKey)
-            eventObj?.endTime=event?.getString(BundleKeys.endTimeKey)
-            eventObj?.startDate=event?.getString(BundleKeys.startDateKey)
-            eventObj?.endDate=event?.getString(BundleKeys.endDateKey)
-            eventObj?.images=event?.getString(BundleKeys.imagesListKey)
-            eventObj?.location= Location()
-            eventObj?.location?.setAddress(addr)
-            eventObj?.location?.setLatitude(lat)
-            eventObj?.location?.setLongitude(lon)
-            eventObj?.location?.zipCode= zipc
-            eventObj?.location?.venueDetails=findViewById<TextView>(R.id.venueDetails).text.toString()
-            eventObj?.setUserId(FirebaseAuth.getInstance().currentUser?.uid)
-            eventObj?.setCreatedTime(System.currentTimeMillis().toString())
-            intent.putExtras(event!!)
-
-
-
-            val storage = FirebaseStorage.getInstance()
-            var storageRef = storage.reference
-            var db= FirebaseDatabase.getInstance().getReference("event")
-            if(intent?.extras?.get(BundleKeys.editEventKey)=="true"){
-                eventObj?.eventId = intent?.extras?.get(BundleKeys.eventIDKey).toString()
+            if(lat.isEmpty() || lon.isEmpty()){
+                Toast.makeText(applicationContext,"Please select the location of the event!", Toast.LENGTH_SHORT).show()
             }else{
-                var key= db.push().key!!
-                eventObj?.eventId = key
-            }
+                var event= intent.extras
+                event?.putString(BundleKeys.addressKey,  addr)
+                event?.putString(BundleKeys.lattitudeKey, lat)
+                event?.putString(BundleKeys.longitudeKey, lon)
+                event?.putString(BundleKeys.zipcodeKey, zipc)
 
-            var videoRef: StorageReference? = storageRef.child("videos").child(eventObj?.eventId+"")
-            val stream = File(GlobalUtil.videoList!![0].toString()).inputStream()
-            var vid= videoRef?.child("0")
-            var uploadTask = vid?.putStream(stream!!)
-            uploadTask?.addOnFailureListener {
-            }?.addOnSuccessListener {
-                vid?.downloadUrl?.addOnCompleteListener{
-                    eventObj?.setVideosDownloadURL(it.result.toString())
+                eventObj= Event()
+                eventObj?.eventName=event?.getString(BundleKeys.eventNameKey)
+                eventObj?.eventDescription=event?.getString(BundleKeys.eventDescriptionKey)
+                eventObj?.eventCategory=event?.getString(BundleKeys.eventCategoryKey)
+                eventObj?.startTime=event?.getString(BundleKeys.startTimeKey)
+                eventObj?.startTime=event?.getString(BundleKeys.startTimeKey)
+                eventObj?.endTime=event?.getString(BundleKeys.endTimeKey)
+                eventObj?.startDate=event?.getString(BundleKeys.startDateKey)
+                eventObj?.endDate=event?.getString(BundleKeys.endDateKey)
+                eventObj?.images=event?.getString(BundleKeys.imagesListKey)
+                eventObj?.location= Location()
+                eventObj?.location?.setAddress(addr)
+                eventObj?.location?.setLatitude(lat)
+                eventObj?.location?.setLongitude(lon)
+                eventObj?.location?.zipCode= zipc
+                eventObj?.location?.venueDetails=findViewById<TextView>(R.id.venueDetails).text.toString()
+                eventObj?.setUserId(FirebaseAuth.getInstance().currentUser?.uid)
+                eventObj?.setCreatedTime(System.currentTimeMillis().toString())
+                intent.putExtras(event!!)
+                val storage = FirebaseStorage.getInstance()
+                var storageRef = storage.reference
+                var db= FirebaseDatabase.getInstance().getReference("event")
+                if(intent?.extras?.get(BundleKeys.editEventKey)=="true"){
+                    eventObj?.eventId = intent?.extras?.get(BundleKeys.eventIDKey).toString()
+                }else{
+                    var key= db.push().key!!
+                    eventObj?.eventId = key
+                }
+                if(GlobalUtil.videoList?.size!! >0){
+                    var videoRef: StorageReference? = storageRef.child("videos").child(eventObj?.eventId+"")
+                    val stream = File(GlobalUtil.videoList!![0].toString()).inputStream()
+                    var vid= videoRef?.child("0")
+                    var uploadTask = vid?.putStream(stream!!)
+                    uploadTask?.addOnFailureListener {
+                    }?.addOnSuccessListener {
+                        vid?.downloadUrl?.addOnCompleteListener{
+                            eventObj?.setVideosDownloadURL(it.result.toString())
+                            UpdateTask().execute(eventObj as Object, this as Object)
+                        }
+                    }
+                }else{
                     UpdateTask().execute(eventObj as Object, this as Object)
                 }
             }
@@ -180,6 +191,8 @@ class CreateEventStep5 : AppCompatActivity() {
         }
     }
     companion object{
+        var activity:Activity?=null
+
         fun changeStatusBarColor(activity: Activity) {
             val window = activity.window
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
@@ -200,6 +213,39 @@ class CreateEventStep5 : AppCompatActivity() {
                 output.add(Uri.parse(uri))
             }
             return output
+        }
+        fun hideKeyboard(activity: Activity) {
+            val imm = activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            //Find the currently focused view, so we can grab the correct window token from it.
+            var view = activity.currentFocus
+            //If no view currently has focus, create a new one, just so we can grab a window token from it
+            if (view == null) {
+                view = View(activity)
+            }
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+
+        fun hideSoftKeyboard(activity: Activity) {
+            if ((activity != null) and (activity.currentFocus != null)) {
+                val inputMethodManager = activity.getSystemService(
+                        Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                inputMethodManager.hideSoftInputFromWindow(activity.currentFocus!!.windowToken, 0)
+            }
+        }
+
+        fun setupUI(view: View) {
+            if (view !is EditText) {
+                view.setOnTouchListener { v, event ->
+                    hideSoftKeyboard(activity!!)
+                    false
+                }
+            }
+            if (view is ViewGroup) {
+                for (i in 0 until view.childCount) {
+                    val innerView = view.getChildAt(i)
+                    setupUI(innerView)
+                }
+            }
         }
     }
     private inner class UpdateTask : AsyncTask<Object, Void?, Void?>() {

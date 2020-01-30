@@ -125,7 +125,7 @@ private static final int RESULT_LOAD_IMAGE = 1;
                     addressLine1.setText(address[0]!=null?address[0]:"");
                     addressLine2.setText(address[1]!=null?address[1]:"");
                     countryName.setText(user.getCountry());
-                    postalCode.setText(address[2]!=null?address[2].replace("Postal code:",""):"");
+                    postalCode.setText(address.length>2?address[2].replace("Postal code:",""):"");
                     if(user.getProfileImgURL()!=null&& !user.getProfileImgURL().isEmpty()){
                         imageToUpload.setImageURI(Uri.parse(user.getProfileImgURL()));
                     }

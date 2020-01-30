@@ -154,6 +154,8 @@ public class EventsAdapter extends ArrayAdapter<Event>{
             holder.participants= view.findViewById(R.id.participants);
             holder.viewCount= view.findViewById(R.id.viewCount);
             holder.videoView= view.findViewById(R.id.videoView);
+            holder.imageSlider= view.findViewById(R.id.imageSlider);
+
             view.setTag(holder);
 		}else{
             holder = (ViewHolder) view.getTag();
@@ -239,22 +241,27 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                     Object imageURI= SharedPreferencesHelper.get(getContext(), PreferenceKeys.profilePhotoURI, "");
                     task2.execute(imageURI, holder.profileImageComment, context);
                     final Boolean[] isRegistered = {false};
-                    DatabaseReference db= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
-                    db.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.getValue()!=null){
-                                isRegistered[0] =true;
-                            }else{
-                                isRegistered[0] =false;
+                    if(FirebaseAuth.getInstance().getCurrentUser()!=null){
+                        DatabaseReference db= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
+                        db.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                for(DataSnapshot child: dataSnapshot.getChildren()){
+                                    if(child.getKey().contains(FirebaseAuth.getInstance().getUid())){
+                                        isRegistered[0] =true;
+                                        break;
+                                    }else{
+                                        isRegistered[0] =false;
+                                    }
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                     if(FirebaseAuth.getInstance().getCurrentUser()==null){
                         holder.menuLayout.setVisibility(View.GONE);
                     }
@@ -284,7 +291,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                                                     .setNegativeButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                                         @Override
                                                         public void onClick(DialogInterface dialog, int which) {
-                                                            holder.eventBox.setVisibility(View.GONE);
+//                                                            holder.eventBox.setVisibility(View.GONE);
                                                             FirebaseDatabase.getInstance().getReference("event").child(values.get(position).getEventId()).removeValue();
                                                             FirebaseDatabase.getInstance().getReference("rating").child(values.get(position).getEventId()).removeValue();
                                                             FirebaseDatabase.getInstance().getReference("comment").child(values.get(position).getEventId()).removeValue();
@@ -292,7 +299,10 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                                                                 FirebaseStorage.getInstance().getReference().child("images").child(values.get(position).getEventId()).child(i+".jpg").delete();
                                                             }
                                                             Toast.makeText(getContext(),"Event deleted!", Toast.LENGTH_SHORT).show();
-                                                            reloadData();
+//                                                            reloadData();
+                                                            values.remove(position);
+                                                            count--;
+                                                            notifyDataSetChanged();
                                                         }
                                                     })
                                                     .setIcon(android.R.drawable.ic_dialog_alert)
@@ -361,8 +371,9 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                                                         public void onClick(DialogInterface dialog, int which) {
                                                             FirebaseAuth auth = FirebaseAuth.getInstance();
                                                             FirebaseUser user = auth.getCurrentUser();
-                                                            final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId());
+                                                            final DatabaseReference regDB= FirebaseDatabase.getInstance().getReference("register").child(values.get(position).getEventId()).child(user.getUid());
                                                             regDB.removeValue();
+                                                            notifyDataSetChanged();
                                                         }
                                                     })
                                                     .setIcon(android.R.drawable.ic_dialog_alert)
@@ -540,8 +551,13 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         });
         View eventDetailsHolder= view.findViewById(R.id.eventDetails);
         holder.videoView.setVisibility(View.GONE);
-
         if(holder.eventName.getText().toString().contentEquals(values.get(position).getEventName())){
+            if(values.get(position).getImagesCount()>0){
+                holder.imageSlider.setVisibility(View.VISIBLE);
+                holder.imageSlider.setSliderAdapter(new SliderAdapter(context, getEventImageStorageReference(values.get(position)), true));
+            }else{
+                holder.imageSlider.setVisibility(View.GONE);
+            }
             if(values.get(position).getVideosCount()>0){
                 holder.videoView.setVisibility(View.VISIBLE);
                 holder.videoView.setVideoURI(Uri.parse(values.get(position).getVideosDownloadURL()));
@@ -559,8 +575,6 @@ public class EventsAdapter extends ArrayAdapter<Event>{
                 });
             }
         }
-        SliderView imageSlider= view.findViewById(R.id.imageSlider);
-        imageSlider.setSliderAdapter(new SliderAdapter(context, getEventImageStorageReference(values.get(position)), true));
         eventDetailsHolder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -610,6 +624,7 @@ public class EventsAdapter extends ArrayAdapter<Event>{
         TextView participantsCount;
         ImageView saveImage;
         VideoView videoView;
+        SliderView imageSlider;
     }
 
     public void reloadData(){

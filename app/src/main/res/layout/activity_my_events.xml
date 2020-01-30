@@ -3,37 +3,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/myEventsContainer"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:weightSum="13"
     android:orientation="vertical"
     tools:context=".fragment.HomeFragment">
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+        android:id="@+id/titleCardView"
+        android:background="@color/colorButtonBlack"
+        android:elevation="8dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0.0px"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        app:cardElevation="10dp">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:weightSum="10"
-            android:gravity="center"
-            android:background="@color/colorWhite"
-            android:orientation="horizontal">
+            android:layout_gravity="center"
+            android:gravity="center">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:id="@+id/back"
+                android:layout_weight="1"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginLeft="12dp"
+                    app:srcCompat="@drawable/ic_back_black"
+                    />
+            </LinearLayout>
 
             <TextView
-                android:layout_weight="7"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="My events"
-                android:layout_gravity="center"
                 android:gravity="center"
-                android:textStyle="bold"
-                android:layout_marginLeft="16dp"
+                android:text="My events"
+                android:layout_weight="8"
                 android:textColor="@color/colorBlack"
-                android:textSize="20dp"/>
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:padding="16dp"
+                app:layout_constraintBottom_toTopOf="@+id/eventName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:id="@+id/close"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:paddingLeft="6dp"
+                android:paddingRight="6dp"
+                android:gravity="center">
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginLeft="12dp"
+                    app:srcCompat="@drawable/ic_close"
+                    />
+            </LinearLayout>
         </LinearLayout>
-
     </androidx.cardview.widget.CardView>
     <LinearLayout
         android:layout_width="match_parent"

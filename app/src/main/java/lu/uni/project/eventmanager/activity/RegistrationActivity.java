@@ -1,14 +1,7 @@
 package lu.uni.project.eventmanager.activity;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +22,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -42,14 +38,13 @@ import com.hbb20.CountryCodePicker;
 import com.ybs.countrypicker.CountryPicker;
 import com.ybs.countrypicker.CountryPickerListener;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
 import lu.uni.project.eventmanager.R;
 import lu.uni.project.eventmanager.pojo.User;
+import lu.uni.project.eventmanager.util.PreferenceKeys;
+import lu.uni.project.eventmanager.util.SharedPreferencesHelper;
 
 public class RegistrationActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -81,9 +76,9 @@ private static final int RESULT_LOAD_IMAGE = 1;
         setContentView(R.layout.activity_registration);
 
         auth = FirebaseAuth.getInstance();
-        imageToUpload = (ImageView) findViewById(R.id.imageToUpload);
-        regBtn = (Button) findViewById(R.id.regBtn) ;
-        inputEmail = (EditText) findViewById(R.id.mailID) ;
+        imageToUpload = findViewById(R.id.imageToUpload);
+        regBtn = findViewById(R.id.regBtn);
+        inputEmail = findViewById(R.id.mailID);
         inputPassword = findViewById(R.id.pwd) ;
         inputConfirmPassword = findViewById(R.id.confirm_pwd) ;
         progressBarHolder =  findViewById(R.id.progressBarHolder);
@@ -122,25 +117,53 @@ private static final int RESULT_LOAD_IMAGE = 1;
                 String confirmPassword = inputConfirmPassword.getText().toString().trim();
                 if (TextUtils.isEmpty(email)) {
                     Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
                     return;
                 }
 
                 if (TextUtils.isEmpty(password) | TextUtils.isEmpty(confirmPassword)) {
                     Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
                     return;
                 }
 
                 if (password.length() < 6) {
                     Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
                     return;
                 }
 
                 if (!confirmPassword.contentEquals(password)) {
                     Toast.makeText(getApplicationContext(), "Password doesn't match", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
                     return;
                 }
-
-//                    progressBar.setVisibility(View.VISIBLE);
+                if (TextUtils.isEmpty(addressLine1.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "Please enter your address", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
+                    return;
+                }
+                if (TextUtils.isEmpty(inputFirstName.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "Please enter your first name", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
+                    return;
+                }
+                if (TextUtils.isEmpty(inputLastName.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "Please enter your last name", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
+                    return;
+                }
+                if (TextUtils.isEmpty(phoneNumber.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "Please enter your phone number", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
+                    return;
+                }
+                if (TextUtils.isEmpty(postalCode.getText().toString())) {
+                    Toast.makeText(getApplicationContext(), "Please enter your postal code", Toast.LENGTH_SHORT).show();
+                    progressBarHolder.setVisibility(View.GONE);
+                    return;
+                }
+//              progressBar.setVisibility(View.VISIBLE);
                 //create user
                 progressBarHolder.setAnimation(inAnimation);
 
@@ -186,10 +209,8 @@ private static final int RESULT_LOAD_IMAGE = 1;
                                                                 userObj.setUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
                                                                 userObj.setProfileImgURL(imgDownloadURL[0]);
                                                                 db.setValue(userObj);
-
+                                                                SharedPreferencesHelper.put(getApplicationContext(), PreferenceKeys.profilePhotoURI, imgDownloadURL[0]);
                                                                 Toast.makeText(RegistrationActivity.this, "Registered succesfully!", Toast.LENGTH_SHORT).show();
-
-
                                                                 progressBarHolder.setAnimation(outAnimation);
                                                                 progressBarHolder.setVisibility(View.GONE);
                                                                 startActivity(new Intent(RegistrationActivity.this, MainActivity.class));
@@ -239,7 +260,7 @@ private static final int RESULT_LOAD_IMAGE = 1;
             @Override
             public void onSelectCountry(String name, String code, String dialCode, int flagDrawableResID) {
 
-                countryName = (EditText)findViewById(R.id.countryName);
+                countryName = findViewById(R.id.countryName);
 
                // countryIcon =  findViewById(R.id.countryIcon
 

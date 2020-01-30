@@ -21,7 +21,7 @@
             android:paddingRight="16dp"
             android:gravity="center"
             >
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/profile_image"
                 android:layout_width="36dp"
@@ -51,7 +51,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 >
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="26dp"
                     android:layout_height="26dp"
@@ -67,7 +67,7 @@
                 android:layout_height="26dp"
                 android:layout_weight="2"
                 android:orientation="horizontal">
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/menu"
                     android:layout_width="26dp"
@@ -90,6 +90,7 @@
                 android:maxHeight="500dp"/>-->
             <LinearLayout
                 android:layout_width="match_parent"
+                android:background="@color/colorBlack"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
                 <VideoView
@@ -136,7 +137,8 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                <androidx.appcompat.widget.AppCompatImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/starImage"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
@@ -162,7 +164,8 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                <androidx.appcompat.widget.AppCompatImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
                     android:layout_gravity="center_horizontal"
@@ -187,7 +190,8 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                <androidx.appcompat.widget.AppCompatImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
                     android:layout_gravity="center_horizontal"
@@ -212,7 +216,8 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                <androidx.appcompat.widget.AppCompatImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
                     android:layout_gravity="center_horizontal"
@@ -236,7 +241,8 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <ImageView xmlns:app="http://schemas.android.com/apk/res-auto"
+                <androidx.appcompat.widget.AppCompatImageView
+                    xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/saveImg"
                     android:layout_width="match_parent"
                     android:layout_height="26dp"
@@ -274,7 +280,7 @@
                     android:layout_height="36dp"
                     android:layout_weight="4"
                     android:orientation="horizontal">
-                    <ImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:layout_marginLeft="16dp"
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
@@ -312,7 +318,7 @@
                     android:layout_gravity="center"
                     android:gravity="center"
                     android:orientation="horizontal">
-                    <ImageView
+                    <androidx.appcompat.widget.AppCompatImageView
                         xmlns:app="http://schemas.android.com/apk/res-auto"
                         android:layout_width="36dp"
                         android:layout_height="36dp"
@@ -346,7 +352,7 @@
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:orientation="horizontal">
-                <ImageView
+                <androidx.appcompat.widget.AppCompatImageView
                     xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/userProfileImgComment"
                     android:layout_width="20dp"

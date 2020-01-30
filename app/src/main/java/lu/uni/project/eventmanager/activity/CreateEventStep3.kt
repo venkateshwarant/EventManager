@@ -13,6 +13,7 @@ import android.transition.Visibility
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
+import android.widget.Toast
 import com.asksira.bsimagepicker.BSImagePicker
 import com.bumptech.glide.Glide
 import com.smarteist.autoimageslider.IndicatorAnimations
@@ -35,19 +36,23 @@ class CreateEventStep3 : AppCompatActivity(),  BSImagePicker.OnSingleImageSelect
             val pickerDialog = BSImagePicker.Builder("lu.uni.project.eventmanager.fileprovider")
                     .setMaximumDisplayingImages(Integer.MAX_VALUE)
                     .isMultiSelect
-                    .setMinimumMultiSelectCount(3)
+                    .setMinimumMultiSelectCount(1)
                     .setMaximumMultiSelectCount(6)
                     .build()
             pickerDialog.show(supportFragmentManager, "picker")
         }
         changeStatusBarColor(this)
         next.setOnClickListener{
-            var event= intent.extras
-            event?.putString(BundleKeys.imagesListKey, imagesList.toString())
-            var intent= Intent(this, CreateEventVideoStep::class.java)
-            intent.putExtras( event!!)
-            startActivity(intent)
-            this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
+            if(imagesList==null){
+                Toast.makeText(applicationContext, "Please select an image",Toast.LENGTH_SHORT).show()
+            }else{
+                var event= intent.extras
+                event?.putString(BundleKeys.imagesListKey, imagesList.toString())
+                var intent= Intent(this, CreateEventVideoStep::class.java)
+                intent.putExtras( event!!)
+                startActivity(intent)
+                this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
+            }
         }
         back.setOnClickListener{
             finish()

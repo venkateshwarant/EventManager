@@ -97,7 +97,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:id="@+id/mailID"
-                        android:hint="Email Id"
+                        android:hint="Email Id*"
                         android:textColorHint="@color/hint_accent_color"
                         android:textColor="@color/text_color"
                         android:inputType="textPersonName"

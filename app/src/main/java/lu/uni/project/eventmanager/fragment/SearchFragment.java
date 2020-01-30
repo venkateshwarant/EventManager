@@ -13,6 +13,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -56,6 +57,7 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
         changeStatusBarColor(getActivity());
         final View root= inflater.inflate(R.layout.fragment_search, container, false);
         final EditText edit_txt = root.findViewById(R.id.searchInput);
+        setupUI(root.findViewById(R.id.searchContainer), getActivity());
         listView= root.findViewById(R.id.filterList);
         edit_txt.setOnEditorActionListener(new EditText.OnEditorActionListener() {
             @Override
@@ -156,7 +158,29 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
     }
 
     private boolean hasCallback;
-
+    public static void hideSoftKeyboard(Activity activity) {
+        if(activity!=null & activity.getCurrentFocus()!=null){
+            InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(
+                    Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+    public void setupUI(View view, final Activity activity) {
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(activity);
+                    return false;
+                }
+            });
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView, activity);
+            }
+        }
+    }
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
@@ -172,4 +196,5 @@ public class SearchFragment extends Fragment implements AbsListView.OnScrollList
             decorView.setSystemUiVisibility(systemUiVisibilityFlags);
         }
     }
+
 }

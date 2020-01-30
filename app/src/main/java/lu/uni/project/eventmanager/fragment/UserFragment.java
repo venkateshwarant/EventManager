@@ -73,20 +73,34 @@ public class UserFragment extends Fragment {
             final LinearLayout savedEventsHolder= root.findViewById(R.id.savedEvents);
             final LinearLayout myEventsHolder= root.findViewById(R.id.myEvents);
             if(FirebaseAuth.getInstance().getCurrentUser()!=null){
-                ImageLoader imageLoader = ImageLoader.getInstance();
                 ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getActivity()));
-                Object imageURI= SharedPreferencesHelper.get(getContext(), PreferenceKeys.profilePhotoURI, "");
-                imageLoader.loadImage(imageURI.toString(), new SimpleImageLoadingListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.DONUT)
+                final String[] imageURI = {""};
+                final DatabaseReference ref = FirebaseDatabase.getInstance().getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                ref.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                        if(getContext()!=null){
-                            BitmapDrawable ob = new BitmapDrawable(getResources(), ImageHelper.getRoundedCornerBitmap(loadedImage,2048));
-                            ImageView profileImage= root.findViewById(R.id.profile_image);
-                            profileImage.setImageDrawable(ob);
-                        }
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        imageURI[0] =user.getProfileImgURL();
+                        ImageLoader imageLoader = ImageLoader.getInstance();
+                        imageLoader.loadImage(imageURI[0], new SimpleImageLoadingListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.DONUT)
+                            @Override
+                            public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                                if(getContext()!=null && loadedImage!=null){
+                                    BitmapDrawable ob = new BitmapDrawable(getResources(), ImageHelper.getRoundedCornerBitmap(loadedImage,2048));
+                                    ImageView profileImage= root.findViewById(R.id.profile_image);
+                                    profileImage.setImageDrawable(ob);
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
                     }
                 });
+
+
                 root.findViewById(R.id.logoutBtn).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -107,7 +121,7 @@ public class UserFragment extends Fragment {
                 });
 
                 final FirebaseDatabase database = FirebaseDatabase.getInstance();
-                final DatabaseReference ref = database.getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                final DatabaseReference userref = database.getReference("user").child(FirebaseAuth.getInstance().getCurrentUser().getUid());
                 ref.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -116,7 +130,7 @@ public class UserFragment extends Fragment {
                             phoneNumber.setText(user.getPhoneNumber());
                             address.setText(user.getAddress());
                             name.setText(user.getDisplayName());
-                            ref.removeEventListener(this);
+                            userref.removeEventListener(this);
                     }
 
                     @Override

@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.text.format.DateFormat
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.takisoft.datetimepicker.DatePickerDialog
 import com.takisoft.datetimepicker.TimePickerDialog
@@ -44,16 +45,19 @@ class CreateEventStep4 : AppCompatActivity() {
         setContentView(R.layout.activity_create_event_step4)
         changeStatusBarColor(this)
         next.setOnClickListener{
-            var event= intent.extras
-            event?.putString(BundleKeys.startDateKey, startDateText.text.toString())
-            event?.putString(BundleKeys.endDateKey, endDateText.text.toString())
-            event?.putString(BundleKeys.startTimeKey, startTimeText.text.toString())
-            event?.putString(BundleKeys.endTimeKey, endTimeText.text.toString())
-
-            var intent= Intent(this, CreateEventStep5::class.java)
-            intent.putExtras( event!!)
-            startActivity(intent)
-            this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
+            if(startDateText.text.toString().isEmpty() || endDateText.text.toString().isEmpty() || startTimeText.text.toString().isEmpty() || endTimeText.text.toString().isEmpty()){
+                Toast.makeText(applicationContext,"Please select the date and time", Toast.LENGTH_SHORT).show()
+            }else{
+                var event= intent.extras
+                event?.putString(BundleKeys.startDateKey, startDateText.text.toString())
+                event?.putString(BundleKeys.endDateKey, endDateText.text.toString())
+                event?.putString(BundleKeys.startTimeKey, startTimeText.text.toString())
+                event?.putString(BundleKeys.endTimeKey, endTimeText.text.toString())
+                var intent= Intent(this, CreateEventStep5::class.java)
+                intent.putExtras( event!!)
+                startActivity(intent)
+                this.overridePendingTransition(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
+            }
         }
         back.setOnClickListener{
             finish()

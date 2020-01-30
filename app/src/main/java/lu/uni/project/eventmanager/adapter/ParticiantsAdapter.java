@@ -49,14 +49,16 @@ public class ParticiantsAdapter extends ArrayAdapter<String>{
 		}else{
 			holder = (ViewHolder) convertView.getTag();
 		}
-
+		holder.name.setText(values.get(position));
+		holder.name.setVisibility(View.INVISIBLE);
 		final FirebaseDatabase database = FirebaseDatabase.getInstance();
 		final DatabaseReference userRef = database.getReference("user").child(values.get(position));
 		userRef.addValueEventListener(new ValueEventListener() {
 			@Override
 			public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 				User user= dataSnapshot.getValue(User.class);
-				if(user!=null){
+				if(user!=null && holder.name.getText().toString().contentEquals(values.get(position))){
+					holder.name.setVisibility(View.VISIBLE);
 					holder.name.setText(user.getDisplayName());
 					EventsAdapter.RetrieveProfileImage task= new EventsAdapter.RetrieveProfileImage();
 					task.execute(user.getProfileImgURL(), holder.profileImage, context);

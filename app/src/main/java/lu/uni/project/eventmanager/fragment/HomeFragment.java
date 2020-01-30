@@ -5,25 +5,25 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.AbsListView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -74,7 +74,7 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
         mHandler = new Handler();
         View footer = getLayoutInflater().inflate(R.layout.progress_bar_footer, null);
         progressBar = footer.findViewById(R.id.progressBar);
-
+        setupUI(root.findViewById(R.id.homeFragContainer), getActivity());
         listView = root.findViewById(R.id.listView);
         listView.addFooterView(footer);
         mySwipeRefreshLayout.setRefreshing(true);
@@ -100,8 +100,12 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
                                     for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                                         Event event = postSnapshot.getValue(Event.class);
                                         outputList.add(event);
-                                        if(distance(Double.parseDouble(event.getLocation().getLatitude()),Double.parseDouble(event.getLocation().getLongitude()), gpsTracker.getLatitude(), gpsTracker.getLongitude())<=range){
-                                            newList.add(event);
+                                        try{
+                                            if(distance(Double.parseDouble(event.getLocation().getLatitude()),Double.parseDouble(event.getLocation().getLongitude()), gpsTracker.getLatitude(), gpsTracker.getLongitude())<=range){
+                                                newList.add(event);
+                                            }
+                                        }catch (NumberFormatException e){
+                                            Log.e("Number format","exception");
                                         }
 
                                     }
@@ -281,6 +285,29 @@ public class HomeFragment extends Fragment implements AbsListView.OnScrollListen
             int systemUiVisibilityFlags = decorView.getSystemUiVisibility();
             systemUiVisibilityFlags = systemUiVisibilityFlags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             decorView.setSystemUiVisibility(systemUiVisibilityFlags);
+        }
+    }
+    public static void hideSoftKeyboard(Activity activity) {
+        if(activity!=null & activity.getCurrentFocus()!=null){
+            InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(
+                    Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+    public void setupUI(View view, final Activity activity) {
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(activity);
+                    return false;
+                }
+            });
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView, activity);
+            }
         }
     }
     private double distance(double lat1, double lon1, double lat2, double lon2) {

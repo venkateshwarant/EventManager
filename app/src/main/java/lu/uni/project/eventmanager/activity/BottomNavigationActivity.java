@@ -5,9 +5,13 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -46,6 +50,7 @@ public class BottomNavigationActivity extends AppCompatActivity implements
         findViewById(R.id.add_btm_ic).setOnClickListener(this);
         findViewById(R.id.star_btm_ic).setOnClickListener(this);
         findViewById(R.id.user_btm_ic).setOnClickListener(this);
+        setupUI(findViewById(R.id.container));
         HomeFragment homeFrag = new HomeFragment();
         FragmentManager fragmentManager = this.getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -136,6 +141,40 @@ public class BottomNavigationActivity extends AppCompatActivity implements
             int systemUiVisibilityFlags = decorView.getSystemUiVisibility();
             systemUiVisibilityFlags = systemUiVisibilityFlags & View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
             decorView.setSystemUiVisibility(systemUiVisibilityFlags);
+        }
+    }
+    public static void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        if(activity!=null & activity.getCurrentFocus()!=null){
+            InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(
+                    Activity.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        }
+    }
+    public void setupUI(View view) {
+        if (!(view instanceof EditText)) {
+            view.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event) {
+                    hideSoftKeyboard(BottomNavigationActivity.this);
+                    return false;
+                }
+            });
+        }
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                View innerView = ((ViewGroup) view).getChildAt(i);
+                setupUI(innerView);
+            }
         }
     }
 }

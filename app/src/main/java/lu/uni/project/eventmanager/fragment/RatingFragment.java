@@ -2,6 +2,7 @@ package lu.uni.project.eventmanager.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lu.uni.project.eventmanager.R;
+import lu.uni.project.eventmanager.activity.LoginActivity;
 import lu.uni.project.eventmanager.adapter.ViewRatingsNotificationAdapter;
 import lu.uni.project.eventmanager.pojo.RatingNotification;
 
@@ -42,32 +44,35 @@ public class RatingFragment extends Fragment {
                              Bundle savedInstanceState) {
         changeStatusBarColor(getActivity());
         View root=inflater.inflate(R.layout.fragment_heart, container, false);
-        final ListView listView= root.findViewById(R.id.ratingList);
-        if(FirebaseAuth.getInstance().getUid()!=null && !FirebaseAuth.getInstance().getUid().contentEquals("")){
-            final FirebaseDatabase database = FirebaseDatabase.getInstance();
-            final DatabaseReference userRef = database.getReference("ratingNotification").child(FirebaseAuth.getInstance().getUid());
-            userRef.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    List<RatingNotification>  ratingNotifications= new ArrayList<>();
-                    for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
-                        RatingNotification rating = postSnapshot.getValue(RatingNotification.class);
-                        ratingNotifications.add(rating);
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            final ListView listView = root.findViewById(R.id.ratingList);
+            if (FirebaseAuth.getInstance().getUid() != null && !FirebaseAuth.getInstance().getUid().contentEquals("")) {
+                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                final DatabaseReference userRef = database.getReference("ratingNotification").child(FirebaseAuth.getInstance().getUid());
+                userRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<RatingNotification> ratingNotifications = new ArrayList<>();
+                        for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                            RatingNotification rating = postSnapshot.getValue(RatingNotification.class);
+                            ratingNotifications.add(rating);
+                        }
+                        FragmentActivity act = getActivity();
+                        if (act != null) {
+                            listView.setAdapter(new ViewRatingsNotificationAdapter(act, ratingNotifications));
+                        }
                     }
-                    FragmentActivity act = getActivity();
-                    if(act!=null){
-                        listView.setAdapter(new ViewRatingsNotificationAdapter(act,ratingNotifications));
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
+                });
+            }
+        }else{
+            startActivity(new Intent(getActivity(), LoginActivity.class));
+            getActivity().finish();
         }
-
-
         return root;
     }
 
