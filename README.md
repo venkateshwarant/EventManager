@@ -3,4 +3,5 @@ Android app with which you can manage, publish your events. View other events ne
 
 ## Basic layout
 
+![img1](https://github.com/venkateshwarant/EventManager/blob/master/img1.jpeg)
 
